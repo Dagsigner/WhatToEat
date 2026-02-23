@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/pytest tests/services/ -v 2>&1)",
+      "Bash(open -a Docker && echo \"Docker запускается...\")",
+      "Bash(docker compose up -d 2>&1)",
+      "Bash(docker compose exec app python -m pytest tests/ -v 2>&1)",
+      "Bash(docker compose exec app sh -c \"which python || which python3; pip list 2>/dev/null | grep -i pytest; find / -name pytest -type f 2>/dev/null | head -5\")",
+      "Bash(docker compose exec app sh -c \"cd /app && .venv/bin/pytest tests/ -v 2>&1\")",
+      "Bash(docker compose exec app sh -c \"find /app -name pytest -type f 2>/dev/null; ls /app/\")",
+      "Bash(docker compose exec app bash -c \"/app/.venv/bin/pytest tests/ -v 2>&1\")",
+      "Bash(docker compose exec app sh -c \"file /app/.venv/bin/pytest; head -1 /app/.venv/bin/pytest\")",
+      "Bash(docker compose exec app sh -c \"/app/.venv/bin/python3 -m pytest tests/ -v 2>&1\")",
+      "Bash(docker compose exec app sh -c \"ls /app/.venv/bin/python*\")",
+      "Bash(docker compose exec app sh -c \"file /app/.venv/bin/python3.11\")",
+      "Bash(docker compose exec app sh -c \"head -1 /app/.venv/bin/python3.11 2>/dev/null || echo 'binary'\")",
+      "Bash(docker compose exec app sh -c \"/app/.venv/bin/python3.11 -m pytest tests/ -v 2>&1\")",
+      "Bash(docker compose exec app sh -c \"ls -la /app/.venv/bin/python* 2>&1\")",
+      "Bash(docker compose exec postgres psql -U whattoeat -c \"CREATE DATABASE whattoeat_test;\" 2>&1)",
+      "Bash(TEST_DATABASE_URL=\"postgresql+asyncpg://whattoeat:whattoeat_secret@localhost:5432/whattoeat_test\" .venv/bin/python3.11 -m pytest tests/ -v 2>&1)",
+      "Bash(TEST_DATABASE_URL=\"postgresql+asyncpg://whattoeat:whattoeat_secret@localhost:5432/whattoeat_test\" .venv/bin/python3.11 -m pytest tests/ -v 2>&1 | tail -20)"
+    ]
+  }
+}
