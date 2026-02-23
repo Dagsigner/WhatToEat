@@ -20,12 +20,11 @@ from app.main import app
 from app.models.user import Admin, User
 from tests.factories.user import UserFactory
 
-ADMIN_TEST_PASSWORD = "testpass123"
+ADMIN_TEST_PASSWORD = os.getenv("ADMIN_TEST_PASSWORD", "testpass123")
 
-TEST_DATABASE_URL = os.getenv(
-    "TEST_DATABASE_URL",
-    "postgresql+asyncpg://whattoeat:whattoeat_secret@localhost:5432/whattoeat_test",
-)
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+if not TEST_DATABASE_URL:
+    raise RuntimeError("TEST_DATABASE_URL is not set. Check your .env file.")
 
 
 @pytest.fixture(scope="session")

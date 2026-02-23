@@ -23,14 +23,15 @@ import app.models.image  # noqa: F401
 import app.models.favorite  # noqa: F401
 import app.models.cooking_history  # noqa: F401
 
-# Default credentials for local dev (change in production!)
-DEV_USERNAME = "admin"
-DEV_PASSWORD = "admin123"
+DEV_USERNAME = os.getenv("DEV_ADMIN_USERNAME", "admin")
+DEV_PASSWORD = os.getenv("DEV_ADMIN_PASSWORD")
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://whattoeat:whattoeat_secret@localhost:5432/whattoeat",
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    sys.exit("ERROR: DATABASE_URL is not set. Check your .env file.")
+if not DEV_PASSWORD:
+    sys.exit("ERROR: DEV_ADMIN_PASSWORD is not set. Check your .env file.")
 
 
 async def main() -> None:

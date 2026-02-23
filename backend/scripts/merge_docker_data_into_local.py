@@ -18,14 +18,11 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Default: Local (5432) -> Docker (5433) — одна общая база в Docker
-SOURCE_URL = os.getenv(
-    "MERGE_SOURCE_URL",
-    "postgresql+asyncpg://whattoeat:whattoeat_secret@127.0.0.1:5432/whattoeat",
-)
-TARGET_URL = os.getenv(
-    "MERGE_TARGET_URL",
-    "postgresql+asyncpg://whattoeat:whattoeat_secret@127.0.0.1:5433/whattoeat",
-)
+SOURCE_URL = os.getenv("MERGE_SOURCE_URL")
+TARGET_URL = os.getenv("MERGE_TARGET_URL")
+
+if not SOURCE_URL or not TARGET_URL:
+    sys.exit("ERROR: MERGE_SOURCE_URL and MERGE_TARGET_URL must be set. Check your .env file.")
 
 # Tables in dependency order (FK-safe)
 TABLES = [
