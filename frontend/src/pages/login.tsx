@@ -38,8 +38,14 @@ export default function LoginPage() {
       const res = await loginAdmin(data);
       setTokens(res.access_token, res.refresh_token, res.username);
       navigate("/");
-    } catch {
-      setError("Invalid username or password");
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { detail?: string }; status?: number } }).response?.data?.detail
+          : null;
+      const fallback =
+        err && typeof err === "object" && "message" in err ? String((err as { message: string }).message) : "Invalid username or password";
+      setError(typeof msg === "string" ? msg : Array.isArray(msg) ? msg.join(", ") : fallback);
     }
   };
 
