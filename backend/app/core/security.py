@@ -87,3 +87,25 @@ def verify_telegram_hash(data: dict[str, str], bot_token: str) -> bool:
     computed_hash = hmac.new(secret_key, check_string.encode(), hashlib.sha256).hexdigest()
 
     return hmac.compare_digest(computed_hash, received_hash)
+
+
+def verify_telegram_webapp(init_data: str, bot_token: str) -> bool:
+    """Verify Telegram Mini App initData using WebAppData HMAC."""
+    from urllib.parse import parse_qs
+
+    parsed = parse_qs(init_data, keep_blank_values=True)
+    received_hash = parsed.get("hash", [""])[0]
+    if not received_hash:
+        return False
+
+    data_pairs = []
+    for key, values in parsed.items():
+        if key == "hash":
+            continue
+        data_pairs.append(f"{key}={values[0]}")
+    check_string = "\n".join(sorted(data_pairs))
+
+    secret_key = hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
+    computed_hash = hmac.new(secret_key, check_string.encode(), hashlib.sha256).hexdigest()
+
+    return hmac.compare_digest(computed_hash, received_hash)

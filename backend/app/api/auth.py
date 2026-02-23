@@ -12,6 +12,7 @@ from app.schemas.auth import (
     RefreshRequest,
     RefreshResponse,
     TelegramAuthData,
+    WebAppAuthData,
 )
 from app.services.auth import AuthService
 
@@ -24,6 +25,14 @@ async def login(
     service: AuthService = Depends(get_auth_service),
 ) -> LoginResponse:
     return await service.authenticate_telegram(auth_data)
+
+
+@router.post("/login/webapp", response_model=LoginResponse, status_code=200)
+async def login_webapp(
+    data: WebAppAuthData,
+    service: AuthService = Depends(get_auth_service),
+) -> LoginResponse:
+    return await service.authenticate_webapp(data.init_data)
 
 
 @router.post("/login/admin", response_model=AdminLoginResponse, status_code=200)

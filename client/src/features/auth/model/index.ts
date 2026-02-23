@@ -1,44 +1,47 @@
 "use client";
 
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { useAuthStore } from "@/shared/store/auth";
 import { useLogin } from "../api";
-import type { TelegramAuthData } from "@/shared/types/auth";
 
 export function useTelegramAuth() {
   const { token, setToken } = useAuthStore();
   const login = useLogin();
   const webAppRef = useRef<typeof import("@twa-dev/sdk").default | null>(null);
+  const [sdkReady, setSdkReady] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
     import("@twa-dev/sdk").then((mod) => {
       webAppRef.current = mod.default;
+      setSdkReady(true);
       try {
         mod.default.ready();
       } catch {
         // Not in Telegram environment
       }
+
+      setDebugInfo(
+        mod.default.initData
+          ? `initData OK (${mod.default.initData.length} chars)`
+          : "initData пуст"
+      );
     });
   }, []);
 
   const authenticate = useCallback(() => {
     const WebApp = webAppRef.current;
-    if (!WebApp) return;
+    if (!WebApp) {
+      setDebugInfo("SDK не загружен");
+      return;
+    }
 
-    const data = WebApp.initDataUnsafe;
-    if (!data?.user?.id || !data?.hash) return;
+    if (!WebApp.initData) {
+      setDebugInfo("initData пуст — откройте через Telegram");
+      return;
+    }
 
-    const authData: TelegramAuthData = {
-      id: data.user.id,
-      first_name: data.user.first_name ?? null,
-      last_name: data.user.last_name ?? null,
-      username: data.user.username ?? null,
-      photo_url: data.user.photo_url ?? null,
-      auth_date: data.auth_date,
-      hash: data.hash,
-    };
-
-    login.mutate(authData, {
+    login.mutate(WebApp.initData, {
       onSuccess: (response) => {
         setToken(response.access_token);
         localStorage.setItem("refresh_token", response.refresh_token);
@@ -51,5 +54,7 @@ export function useTelegramAuth() {
     authenticate,
     isLoading: login.isPending,
     error: login.error,
+    sdkReady,
+    debugInfo,
   };
 }

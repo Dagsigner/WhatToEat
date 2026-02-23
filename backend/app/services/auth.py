@@ -17,6 +17,7 @@ from app.core.security import (
     decode_token,
     decode_token_payload,
     verify_telegram_hash,
+    verify_telegram_webapp,
 )
 from app.models.user import Admin, User
 from app.repositories.user import UserRepository
@@ -53,6 +54,46 @@ class AuthService:
         refresh_token = create_refresh_token(user.id)
 
         logger.info("user_authenticated", user_id=str(user.id), tg_id=auth_data.id)
+        return LoginResponse(
+            user_id=user.id, tg_id=user.tg_id, tg_username=user.tg_username,
+            phone_number=user.phone_number, access_token=access_token,
+            refresh_token=refresh_token, token_type=TOKEN_TYPE,
+            expires_in=settings.jwt_access_token_expire_minutes * 60,
+        )
+
+    async def authenticate_webapp(self, init_data: str) -> LoginResponse:
+        """Verify Telegram WebApp initData, find-or-create user, and issue token pair."""
+        import json
+        from urllib.parse import parse_qs
+
+        settings = get_settings()
+
+        if not verify_telegram_webapp(init_data, settings.telegram_bot_token):
+            raise BadRequestException("Invalid Telegram WebApp data")
+
+        parsed = parse_qs(init_data, keep_blank_values=True)
+        user_json = parsed.get("user", [""])[0]
+        if not user_json:
+            raise BadRequestException("Missing user data in initData")
+
+        user_data = json.loads(user_json)
+
+        auth_data = TelegramAuthData(
+            id=user_data["id"],
+            first_name=user_data.get("first_name"),
+            last_name=user_data.get("last_name"),
+            username=user_data.get("username"),
+            photo_url=user_data.get("photo_url"),
+            auth_date=int(parsed.get("auth_date", ["0"])[0]),
+            hash=parsed.get("hash", [""])[0],
+        )
+
+        user = await self._get_or_create_user(auth_data)
+
+        access_token = create_access_token(user.id)
+        refresh_token = create_refresh_token(user.id)
+
+        logger.info("user_authenticated_webapp", user_id=str(user.id), tg_id=auth_data.id)
         return LoginResponse(
             user_id=user.id, tg_id=user.tg_id, tg_username=user.tg_username,
             phone_number=user.phone_number, access_token=access_token,

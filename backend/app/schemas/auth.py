@@ -19,6 +19,10 @@ class TelegramAuthData(BaseModel):
     tg_username: str | None = Field(None)
 
 
+class WebAppAuthData(BaseModel):
+    init_data: str = Field(..., description="Raw Telegram WebApp initData string")
+
+
 class AdminLoginRequest(BaseModel):
     username: str = Field(...)
     password: str = Field(...)

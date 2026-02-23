@@ -3,7 +3,7 @@
 import { useTelegramAuth } from "../model";
 
 export function LoginScreen() {
-  const { authenticate, isLoading, error } = useTelegramAuth();
+  const { authenticate, isLoading, error, sdkReady, debugInfo } = useTelegramAuth();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">
@@ -13,7 +13,7 @@ export function LoginScreen() {
       </p>
       <button
         onClick={authenticate}
-        disabled={isLoading}
+        disabled={isLoading || !sdkReady}
         className="rounded-xl bg-[var(--tg-theme-button-color,#3390ec)] px-8 py-3 font-medium text-[var(--tg-theme-button-text-color,#fff)] disabled:opacity-50"
       >
         {isLoading ? "Вход..." : "Войти в аккаунт"}
@@ -22,6 +22,11 @@ export function LoginScreen() {
         <p className="text-sm text-red-500">
           Ошибка входа. Попробуйте ещё раз.
         </p>
+      )}
+      {debugInfo && (
+        <pre className="mt-4 max-w-full overflow-auto rounded bg-gray-100 p-3 text-xs text-gray-600">
+          {debugInfo}
+        </pre>
       )}
     </div>
   );
