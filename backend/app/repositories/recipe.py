@@ -73,7 +73,14 @@ class RecipeRepository(BaseRepository[Recipe]):
     async def list_client(
         self, limit: int, offset: int, user_id: UUID, *,
         category_id: UUID | None = None, search: str | None = None, slug: str | None = None,
+        is_in_history: bool | None = None,
     ) -> tuple[Sequence[Row[Any]], int]:
+        history_exists = exists(
+            select(CookingHistory.id).where(
+                CookingHistory.recipe_id == Recipe.id, CookingHistory.user_id == user_id,
+            )
+        )
+
         query = select(
             Recipe.id, Recipe.slug, Recipe.title, Recipe.photo_url,
             Recipe.prep_time, Recipe.cook_time, Recipe.difficulty, Recipe.servings,
@@ -82,14 +89,17 @@ class RecipeRepository(BaseRepository[Recipe]):
                     FavoriteRecipe.recipe_id == Recipe.id, FavoriteRecipe.user_id == user_id,
                 )
             ).label("is_favorited"),
-            exists(
-                select(CookingHistory.id).where(
-                    CookingHistory.recipe_id == Recipe.id, CookingHistory.user_id == user_id,
-                )
-            ).label("is_in_history"),
+            history_exists.label("is_in_history"),
         ).where(Recipe.is_active.is_(True))
 
         count_query = select(func.count()).select_from(Recipe).where(Recipe.is_active.is_(True))
+
+        if is_in_history is True:
+            query = query.where(history_exists)
+            count_query = count_query.where(history_exists)
+        elif is_in_history is False:
+            query = query.where(~history_exists)
+            count_query = count_query.where(~history_exists)
 
         if category_id:
             query = query.join(RecipeCategory).where(RecipeCategory.category_id == category_id)

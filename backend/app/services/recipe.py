@@ -69,11 +69,12 @@ class RecipeService:
     async def list_client(
         self, pagination: PaginationParams, user_id: UUID, *,
         category_id: UUID | None = None, search: str | None = None, slug: str | None = None,
+        is_in_history: bool | None = None,
     ) -> PaginatedResponse[RecipeClientListResponse]:
         """Return a paginated client-facing recipe list with favorite/history flags."""
         rows, total = await self.repo.list_client(
             pagination.limit, pagination.offset, user_id,
-            category_id=category_id, search=search, slug=slug,
+            category_id=category_id, search=search, slug=slug, is_in_history=is_in_history,
         )
         items = [
             RecipeClientListResponse(

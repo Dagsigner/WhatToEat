@@ -41,11 +41,13 @@ async def list_recipes(
     category_id: UUID | None = Query(None),
     search: str | None = Query(None),
     slug: str | None = Query(None),
+    is_in_history: bool | None = Query(None),
     current_user: User = Depends(get_current_user),
     service: RecipeService = Depends(get_recipe_service),
 ) -> PaginatedResponse[RecipeClientListResponse]:
     return await service.list_client(
-        pagination, current_user.id, category_id=category_id, search=search, slug=slug,
+        pagination, current_user.id,
+        category_id=category_id, search=search, slug=slug, is_in_history=is_in_history,
     )
 
 
