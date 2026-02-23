@@ -35,6 +35,12 @@ htmlcov/
 # ruff
 .ruff_cache/
 
+# Next.js
+.next/
+
+# Node
+node_modules/
+
 # Uploads and Redis
 uploads/
 *.rdb
