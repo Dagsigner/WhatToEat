@@ -39,13 +39,13 @@ export default function LoginPage() {
       setTokens(res.access_token, res.refresh_token, res.username);
       navigate("/");
     } catch (err: unknown) {
-      const msg =
+      const detail: unknown =
         err && typeof err === "object" && "response" in err
-          ? (err as { response?: { data?: { detail?: string }; status?: number } }).response?.data?.detail
+          ? (err as { response?: { data?: { detail?: unknown } } }).response?.data?.detail
           : null;
       const fallback =
         err && typeof err === "object" && "message" in err ? String((err as { message: string }).message) : "Invalid username or password";
-      setError(typeof msg === "string" ? msg : Array.isArray(msg) ? msg.join(", ") : fallback);
+      setError(typeof detail === "string" ? detail : Array.isArray(detail) ? detail.join(", ") : fallback);
     }
   };
 
