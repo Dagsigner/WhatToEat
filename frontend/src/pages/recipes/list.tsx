@@ -82,7 +82,7 @@ export default function RecipesListPage() {
                     <TableCell>
                       {r.photo_url ? (
                         <img
-                          src={r.photo_url.startsWith("http") ? r.photo_url : `http://localhost:8000${r.photo_url}`}
+                          src={r.photo_url}
                           alt=""
                           className="h-10 w-10 rounded object-cover"
                         />

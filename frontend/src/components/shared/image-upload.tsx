@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { uploadFile } from "@/api/images";
 import { toast } from "sonner";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = "";
 const ACCEPTED = "image/jpeg,image/png,image/webp,image/gif";
 const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
 

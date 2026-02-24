@@ -37,6 +37,8 @@ class Settings(BaseSettings):
 
     telegram_bot_token: str = ""
 
+    cors_origins: str = ""
+
     app_env: str = "development"
     app_debug: bool = True
 

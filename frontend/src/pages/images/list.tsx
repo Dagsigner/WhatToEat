@@ -124,7 +124,7 @@ export default function ImagesListPage() {
             {data?.items.map((img) => (
               <Card key={img.id} className="overflow-hidden">
                 <div className="aspect-square bg-muted">
-                  <img src={img.url.startsWith("http") ? img.url : `http://localhost:8000${img.url}`} alt={img.filename ?? "image"} className="h-full w-full object-cover" />
+                  <img src={img.url} alt={img.filename ?? "image"} className="h-full w-full object-cover" />
                 </div>
                 <CardContent className="p-3">
                   <p className="truncate text-sm font-medium">{img.filename ?? "unnamed"}</p>
