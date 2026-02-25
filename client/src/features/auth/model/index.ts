@@ -9,7 +9,6 @@ export function useTelegramAuth() {
   const login = useLogin();
   const webAppRef = useRef<typeof import("@twa-dev/sdk").default | null>(null);
   const [sdkReady, setSdkReady] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
     import("@twa-dev/sdk").then((mod) => {
@@ -20,26 +19,12 @@ export function useTelegramAuth() {
       } catch {
         // Not in Telegram environment
       }
-
-      setDebugInfo(
-        mod.default.initData
-          ? `initData OK (${mod.default.initData.length} chars)`
-          : "initData пуст"
-      );
     });
   }, []);
 
   const authenticate = useCallback(() => {
     const WebApp = webAppRef.current;
-    if (!WebApp) {
-      setDebugInfo("SDK не загружен");
-      return;
-    }
-
-    if (!WebApp.initData) {
-      setDebugInfo("initData пуст — откройте через Telegram");
-      return;
-    }
+    if (!WebApp || !WebApp.initData) return;
 
     login.mutate(WebApp.initData, {
       onSuccess: (response) => {
@@ -49,12 +34,18 @@ export function useTelegramAuth() {
     });
   }, [login.mutate, setToken]);
 
+  // Автовход: как только SDK готов и есть initData — входим автоматически
+  useEffect(() => {
+    if (sdkReady && !token && webAppRef.current?.initData) {
+      authenticate();
+    }
+  }, [sdkReady, token, authenticate]);
+
   return {
     isAuthenticated: !!token,
     authenticate,
     isLoading: login.isPending,
     error: login.error,
     sdkReady,
-    debugInfo,
   };
 }
