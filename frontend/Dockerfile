@@ -22,4 +22,4 @@ COPY nginx.conf.template /tmp/nginx.conf.template
 
 EXPOSE 4173
 
-CMD ["sh", "-c", "envsubst '$$BACKEND_URL' < /tmp/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD ["sh", "-c", "envsubst '$BACKEND_URL' < /tmp/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
