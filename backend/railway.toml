@@ -1,3 +1,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
+
+[[volumes]]
+mount = "/app/uploads"
+name = "uploads"
