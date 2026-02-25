@@ -1,5 +1,6 @@
 """FastAPI application entry point."""
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -26,9 +27,42 @@ logger = structlog.get_logger()
 settings = get_settings()
 
 
+async def _seed_admin() -> None:
+    """Create or update admin user if DEV_ADMIN_PASSWORD is set."""
+    password = os.environ.get("DEV_ADMIN_PASSWORD")
+    if not password:
+        return
+
+    import bcrypt
+    from sqlalchemy import select
+    from app.core.database import async_session_factory
+    from app.models.user import Admin, User
+
+    username = os.environ.get("DEV_ADMIN_USERNAME", "admin")
+    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+    async with async_session_factory() as session:
+        result = await session.execute(select(Admin).where(Admin.username == username))
+        existing = result.scalar_one_or_none()
+
+        if existing:
+            existing.password_hash = hashed
+            await session.commit()
+            logger.info("admin_password_updated", username=username)
+        else:
+            user = User(tg_id=999999999, tg_username="admin", username="admin", first_name="Admin")
+            session.add(user)
+            await session.flush()
+            admin = Admin(user_id=user.id, username=username, password_hash=hashed)
+            session.add(admin)
+            await session.commit()
+            logger.info("admin_created", username=username)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("app_starting", env=settings.app_env)
+    await _seed_admin()
     yield
     await close_redis()
     logger.info("app_shutting_down")
