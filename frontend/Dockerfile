@@ -18,6 +18,8 @@ ARG BACKEND_URL=https://backend-production-4dea.up.railway.app
 ENV BACKEND_URL=$BACKEND_URL
 
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY nginx.conf.template /tmp/nginx.conf.template
 
 EXPOSE 4173
+
+CMD ["sh", "-c", "envsubst '$$BACKEND_URL' < /tmp/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
