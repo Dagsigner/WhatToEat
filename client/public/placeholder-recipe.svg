@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="8" fill="#F3F4F6"/>
+  <!-- Plate -->
+  <ellipse cx="200" cy="165" rx="72" ry="18" fill="#D1D5DB"/>
+  <ellipse cx="200" cy="160" rx="72" ry="18" fill="#E5E7EB"/>
+  <ellipse cx="200" cy="160" rx="56" ry="14" fill="#F3F4F6"/>
+  <!-- Steam lines -->
+  <path d="M180 120 Q175 108 180 96" stroke="#D1D5DB" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M200 115 Q195 103 200 91" stroke="#D1D5DB" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M220 120 Q215 108 220 96" stroke="#D1D5DB" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Fork (left) -->
+  <g transform="translate(112, 130) rotate(-30)">
+    <rect x="0" y="0" width="3" height="50" rx="1.5" fill="#D1D5DB"/>
+    <rect x="-4" y="-12" width="3" height="14" rx="1.5" fill="#D1D5DB"/>
+    <rect x="0" y="-12" width="3" height="14" rx="1.5" fill="#D1D5DB"/>
+    <rect x="4" y="-12" width="3" height="14" rx="1.5" fill="#D1D5DB"/>
+  </g>
+  <!-- Knife (right) -->
+  <g transform="translate(280, 130) rotate(30)">
+    <rect x="0" y="0" width="3" height="50" rx="1.5" fill="#D1D5DB"/>
+    <path d="M0 -12 Q1.5 -16 3 -12 L3 2 L0 2 Z" fill="#D1D5DB"/>
+  </g>
+  <!-- Text -->
+  <text x="200" y="215" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#9CA3AF">No photo</text>
+</svg>
