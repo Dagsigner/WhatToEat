@@ -3,7 +3,6 @@ __pycache__
 .env*
 .venv
 tests
-uploads
 .git
 dump.rdb
 .pytest_cache
