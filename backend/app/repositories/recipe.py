@@ -138,7 +138,7 @@ class RecipeRepository(BaseRepository[Recipe]):
                 CookingHistory.recipe_id == recipe_id, CookingHistory.user_id == user_id,
             )
         )
-        return fav.scalar_one_or_none() is not None, hist.scalar_one_or_none() is not None
+        return fav.first() is not None, hist.first() is not None
 
     async def replace_categories(self, recipe_id: UUID, category_ids: list[UUID]) -> None:
         await self.db.execute(delete(RecipeCategory).where(RecipeCategory.recipe_id == recipe_id))
