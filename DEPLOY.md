@@ -18,6 +18,10 @@ git push
 - **Root Directory**: `backend` / `frontend` / `client`
 - **Config File**: `/backend/railway.toml` / `/frontend/railway.toml` / `/client/railway.toml`
 
+### Важно: НЕ указывать dockerfilePath в railway.toml
+
+`dockerfilePath = "Dockerfile"` ломает автодеплой — Railway ищет Dockerfile относительно корня репо, а не Root Directory. Без этой строки Railway сам находит Dockerfile через Root Directory.
+
 ## Ручной деплой через CLI (fallback)
 
 ```bash
