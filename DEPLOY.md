@@ -1,9 +1,24 @@
 # Деплой WhatToEat на Railway
 
 Монорепозиторий: backend, frontend, client в одном репо.
-GitHub auto-deploy не работает — деплой только через CLI.
 
-## Команды деплоя
+## Автодеплой (основной способ)
+
+Просто пушь в main — Railway автоматически деплоит изменённые сервисы.
+
+```bash
+git push
+```
+
+Каждый сервис деплоится только при изменениях в своей папке (watchPatterns в railway.toml).
+
+### Настройка в Railway dashboard (уже сделана)
+
+Для каждого сервиса в Settings:
+- **Root Directory**: `backend` / `frontend` / `client`
+- **Config File**: `/backend/railway.toml` / `/frontend/railway.toml` / `/client/railway.toml`
+
+## Ручной деплой через CLI (fallback)
 
 ```bash
 # Backend (FastAPI)
