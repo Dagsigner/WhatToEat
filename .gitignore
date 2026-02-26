@@ -41,6 +41,5 @@ htmlcov/
 # Node
 node_modules/
 
-# Uploads and Redis
-uploads/
+# Redis
 *.rdb
