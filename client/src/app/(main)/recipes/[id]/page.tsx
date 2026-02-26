@@ -13,12 +13,36 @@ import { getImageUrl } from "@/shared/lib/image-url";
 export default function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { data: recipe, isLoading } = useRecipeDetail(id);
+  const { data: recipe, isLoading, isError, refetch } = useRecipeDetail(id);
   const toggleFav = useToggleFavorite();
   const addHistory = useAddToHistory();
 
-  if (isLoading || !recipe) {
+  if (isLoading) {
     return <Spinner className="pt-20" />;
+  }
+
+  if (isError || !recipe) {
+    return (
+      <div className="flex flex-col items-center gap-4 pt-20">
+        <p className="text-sm text-[var(--tg-theme-hint-color,#999)]">
+          Не удалось загрузить рецепт
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="rounded-xl bg-[var(--tg-theme-button-color,#3390ec)] px-6 py-2 text-sm text-[var(--tg-theme-button-text-color,#fff)]"
+        >
+          Попробовать снова
+        </button>
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="text-sm text-[var(--tg-theme-hint-color,#999)]"
+        >
+          Назад
+        </button>
+      </div>
+    );
   }
 
   const totalTime = recipe.prep_time + recipe.cook_time;
