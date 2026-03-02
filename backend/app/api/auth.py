@@ -35,6 +35,13 @@ async def login_webapp(
     return await service.authenticate_webapp(data.init_data)
 
 
+@router.post("/login/dev", response_model=LoginResponse, status_code=200)
+async def login_dev(
+    service: AuthService = Depends(get_auth_service),
+) -> LoginResponse:
+    return await service.authenticate_dev()
+
+
 @router.post("/login/admin", response_model=AdminLoginResponse, status_code=200)
 async def login_admin(
     data: AdminLoginRequest,

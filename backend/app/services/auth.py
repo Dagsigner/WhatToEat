@@ -101,6 +101,34 @@ class AuthService:
             expires_in=settings.jwt_access_token_expire_minutes * 60,
         )
 
+    async def authenticate_dev(self) -> LoginResponse:
+        """Dev-only login: find-or-create a dev user and issue tokens. Never available in production."""
+        settings = get_settings()
+        if settings.app_env == "production":
+            raise BadRequestException("Dev login is not available in production")
+
+        dev_tg_id = 999_999_999
+        auth_data = TelegramAuthData(
+            id=dev_tg_id,
+            first_name="Dev",
+            last_name="User",
+            username="dev_user",
+            auth_date=int(datetime.now(timezone.utc).timestamp()),
+            hash="dev",
+        )
+        user = await self._get_or_create_user(auth_data)
+
+        access_token = create_access_token(user.id)
+        refresh_token = create_refresh_token(user.id)
+
+        logger.info("dev_user_authenticated", user_id=str(user.id))
+        return LoginResponse(
+            user_id=user.id, tg_id=user.tg_id, tg_username=user.tg_username,
+            phone_number=user.phone_number, access_token=access_token,
+            refresh_token=refresh_token, token_type=TOKEN_TYPE,
+            expires_in=settings.jwt_access_token_expire_minutes * 60,
+        )
+
     async def authenticate_admin(self, username: str, password: str) -> AdminLoginResponse:
         """Validate admin credentials and return an access/refresh token pair."""
         settings = get_settings()

@@ -12,3 +12,12 @@ export function useLogin() {
     },
   });
 }
+
+export function useDevLogin() {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await api.post<LoginResponse>("/auth/login/dev");
+      return response.data;
+    },
+  });
+}
