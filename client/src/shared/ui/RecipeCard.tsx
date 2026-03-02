@@ -6,7 +6,7 @@ import { formatMinutes, formatDifficulty } from "@/shared/lib/format";
 import { getImageUrl } from "@/shared/lib/image-url";
 import type { RecipeListItem } from "@/shared/types/recipe";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { HeartAddIcon, FavouriteIcon } from "@hugeicons/core-free-icons";
+import { FavouriteIcon } from "@hugeicons/core-free-icons";
 
 interface RecipeCardProps {
   recipe: RecipeListItem;
@@ -42,7 +42,7 @@ export function RecipeCard({
               }}
               className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/30"
             >
-              <HugeiconsIcon icon={HeartAddIcon} altIcon={FavouriteIcon} showAlt={recipe.is_favorited} size={16} />
+              <HugeiconsIcon icon={FavouriteIcon} size={16} color={recipe.is_favorited ? "#ef4444" : "currentColor"} />
             </button>
           )}
         </div>
@@ -88,7 +88,7 @@ export function RecipeCard({
                 onFavoriteToggle(recipe.id, recipe.is_favorited);
               }}
             >
-              <HugeiconsIcon icon={HeartAddIcon} altIcon={FavouriteIcon} showAlt={recipe.is_favorited} size={20} />
+              <HugeiconsIcon icon={FavouriteIcon} size={20} color={recipe.is_favorited ? "#ef4444" : "currentColor"} />
             </button>
           </div>
         )}
