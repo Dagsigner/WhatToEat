@@ -5,6 +5,8 @@ import { useRecipes, useToggleFavorite } from "@/features/recipes";
 import { useCategories } from "@/features/categories";
 import { RecipeCard, Spinner, EmptyState, Input } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { HeartbreakIcon, Search01Icon } from "@hugeicons/core-free-icons";
 import { useDebounce } from "@/shared/lib/use-debounce";
 
 type Tab = "all" | "favorites";
@@ -102,7 +104,7 @@ export default function RecipesPage() {
         <Spinner />
       ) : !data?.items.length ? (
         <EmptyState
-          icon={tab === "favorites" ? "💔" : "🔍"}
+          icon={<HugeiconsIcon icon={tab === "favorites" ? HeartbreakIcon : Search01Icon} size={36} />}
           title={tab === "favorites" ? "Нет избранных рецептов" : "Ничего не найдено"}
           description={
             tab === "favorites"

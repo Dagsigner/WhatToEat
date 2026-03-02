@@ -2,6 +2,8 @@
 
 import { useHistoryRecipes, useRecipes, useToggleFavorite } from "@/features/recipes";
 import { RecipeCard, Spinner, EmptyState } from "@/shared/ui";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Pot01Icon, BookOpen01Icon } from "@hugeicons/core-free-icons";
 
 export default function HomePage() {
   const { data: history, isLoading: historyLoading } = useHistoryRecipes(10);
@@ -23,7 +25,7 @@ export default function HomePage() {
           <Spinner />
         ) : !history?.items.length ? (
           <EmptyState
-            icon="🍳"
+            icon={<HugeiconsIcon icon={Pot01Icon} size={36} />}
             title="Пока ничего"
             description="Отмечайте рецепты как приготовленные"
           />
@@ -50,7 +52,7 @@ export default function HomePage() {
           <Spinner />
         ) : !suggestions?.items.length ? (
           <EmptyState
-            icon="📖"
+            icon={<HugeiconsIcon icon={BookOpen01Icon} size={36} />}
             title="Рецептов пока нет"
             description="Скоро здесь появятся рецепты"
           />

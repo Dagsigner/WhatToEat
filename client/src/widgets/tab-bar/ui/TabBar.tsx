@@ -1,13 +1,16 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/shared/lib/utils";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Home01Icon, Restaurant01Icon, UserCircleIcon } from "@hugeicons/core-free-icons";
 
-const tabs = [
-  { href: "/", label: "Главная", icon: "🏠" },
-  { href: "/recipes", label: "Рецепты", icon: "🍽" },
-  { href: "/profile", label: "Профиль", icon: "👤" },
+const tabs: { href: string; label: string; icon: ReactNode }[] = [
+  { href: "/", label: "Главная", icon: <HugeiconsIcon icon={Home01Icon} size={24} /> },
+  { href: "/recipes", label: "Рецепты", icon: <HugeiconsIcon icon={Restaurant01Icon} size={24} /> },
+  { href: "/profile", label: "Профиль", icon: <HugeiconsIcon icon={UserCircleIcon} size={24} /> },
 ];
 
 export function TabBar() {
@@ -32,7 +35,7 @@ export function TabBar() {
                   : "text-muted-foreground"
               )}
             >
-              <span className="text-xl">{tab.icon}</span>
+              {tab.icon}
               <span>{tab.label}</span>
             </Link>
           );

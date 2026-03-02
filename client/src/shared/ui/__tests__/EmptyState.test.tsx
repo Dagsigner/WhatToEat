@@ -10,16 +10,16 @@ describe("EmptyState", () => {
     expect(screen.getByText("Ничего не найдено")).toBeInTheDocument();
   });
 
-  it("рендерит дефолтную иконку, если не передана", () => {
-    render(<EmptyState title="Пусто" />);
+  it("рендерит дефолтную иконку (svg), если не передана", () => {
+    const { container } = render(<EmptyState title="Пусто" />);
 
-    expect(screen.getByText("📭")).toBeInTheDocument();
+    expect(container.querySelector("svg")).toBeInTheDocument();
   });
 
   it("рендерит переданную иконку", () => {
-    render(<EmptyState title="Пусто" icon="🔍" />);
+    render(<EmptyState title="Пусто" icon={<span data-testid="custom-icon">!</span>} />);
 
-    expect(screen.getByText("🔍")).toBeInTheDocument();
+    expect(screen.getByTestId("custom-icon")).toBeInTheDocument();
   });
 
   it("не рендерит description, если не передан", () => {
