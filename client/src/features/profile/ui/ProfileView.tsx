@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDate } from "@/shared/lib/format";
+import { Button } from "@/shared/ui";
 import type { UserProfile } from "@/shared/types/user";
 
 interface ProfileViewProps {
@@ -17,21 +18,21 @@ export function ProfileView({ user, onEdit }: ProfileViewProps) {
     <div className="space-y-4">
       {/* Аватар и имя */}
       <div className="flex flex-col items-center gap-2 pt-4">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--tg-theme-button-color,#3390ec)] text-3xl text-white">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-3xl text-primary-foreground">
           {(user.first_name?.[0] || user.tg_username?.[0] || "?").toUpperCase()}
         </div>
-        <h2 className="text-lg font-semibold text-[var(--tg-theme-text-color,#333)]">
+        <h2 className="text-lg font-semibold text-foreground">
           {displayName}
         </h2>
         {user.tg_username && (
-          <p className="text-sm text-[var(--tg-theme-hint-color,#999)]">
+          <p className="text-sm text-muted-foreground">
             @{user.tg_username}
           </p>
         )}
       </div>
 
       {/* Информация */}
-      <div className="space-y-3 rounded-xl bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] p-4">
+      <div className="space-y-3 rounded-xl bg-secondary p-4">
         <InfoRow label="Имя" value={user.first_name} />
         <InfoRow label="Фамилия" value={user.last_name} />
         <InfoRow label="Username" value={user.username} />
@@ -40,13 +41,14 @@ export function ProfileView({ user, onEdit }: ProfileViewProps) {
       </div>
 
       {/* Кнопка редактирования */}
-      <button
+      <Button
         type="button"
         onClick={onEdit}
-        className="w-full rounded-xl bg-[var(--tg-theme-button-color,#3390ec)] py-3 text-sm font-medium text-[var(--tg-theme-button-text-color,#fff)]"
+        className="w-full rounded-xl"
+        size="lg"
       >
         Редактировать
-      </button>
+      </Button>
     </div>
   );
 }
@@ -54,10 +56,10 @@ export function ProfileView({ user, onEdit }: ProfileViewProps) {
 function InfoRow({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-[var(--tg-theme-hint-color,#999)]">
+      <span className="text-sm text-muted-foreground">
         {label}
       </span>
-      <span className="text-sm text-[var(--tg-theme-text-color,#333)]">
+      <span className="text-sm text-foreground">
         {value || "—"}
       </span>
     </div>

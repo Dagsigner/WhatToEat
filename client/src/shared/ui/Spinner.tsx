@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib/cn";
+import { cn } from "@/shared/lib/utils";
 
 interface SpinnerProps {
   className?: string;
@@ -9,7 +9,7 @@ interface SpinnerProps {
 export function Spinner({ className }: SpinnerProps) {
   return (
     <div className={cn("flex items-center justify-center py-8", className)}>
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--tg-theme-button-color,#3390ec)] border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
     </div>
   );
 }

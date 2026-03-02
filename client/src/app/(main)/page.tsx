@@ -16,7 +16,7 @@ export default function HomePage() {
     <div className="space-y-6 p-4">
       {/* Недавно приготовлено */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-[var(--tg-theme-text-color,#333)]">
+        <h2 className="mb-3 text-lg font-semibold text-foreground">
           Недавно приготовлено
         </h2>
         {historyLoading ? (
@@ -43,7 +43,7 @@ export default function HomePage() {
 
       {/* Что приготовить сегодня? */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-[var(--tg-theme-text-color,#333)]">
+        <h2 className="mb-3 text-lg font-semibold text-foreground">
           Что приготовить сегодня?
         </h2>
         {suggestionsLoading ? (

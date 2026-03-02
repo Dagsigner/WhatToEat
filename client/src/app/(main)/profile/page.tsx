@@ -27,7 +27,7 @@ export default function ProfilePage() {
 
   return (
     <div className="p-4">
-      <h1 className="mb-4 text-xl font-semibold text-[var(--tg-theme-text-color,#333)]">
+      <h1 className="mb-4 text-xl font-semibold text-foreground">
         Профиль
       </h1>
       {isEditing ? (

@@ -6,7 +6,7 @@ import {
   useToggleFavorite,
   useAddToHistory,
 } from "@/features/recipes";
-import { Spinner } from "@/shared/ui";
+import { Spinner, Button } from "@/shared/ui";
 import { formatMinutes, formatDifficulty } from "@/shared/lib/format";
 import { getImageUrl } from "@/shared/lib/image-url";
 
@@ -24,20 +24,19 @@ export default function RecipeDetailPage() {
   if (isError || !recipe) {
     return (
       <div className="flex flex-col items-center gap-4 pt-20">
-        <p className="text-sm text-[var(--tg-theme-hint-color,#999)]">
+        <p className="text-sm text-muted-foreground">
           Не удалось загрузить рецепт
         </p>
-        <button
-          type="button"
+        <Button
           onClick={() => refetch()}
-          className="rounded-xl bg-[var(--tg-theme-button-color,#3390ec)] px-6 py-2 text-sm text-[var(--tg-theme-button-text-color,#fff)]"
+          className="rounded-xl px-6"
         >
           Попробовать снова
-        </button>
+        </Button>
         <button
           type="button"
           onClick={() => router.back()}
-          className="text-sm text-[var(--tg-theme-hint-color,#999)]"
+          className="text-sm text-muted-foreground"
         >
           Назад
         </button>
@@ -69,11 +68,11 @@ export default function RecipeDetailPage() {
       <div className="space-y-5 p-4">
         {/* Заголовок */}
         <div>
-          <h1 className="text-xl font-bold text-[var(--tg-theme-text-color,#333)]">
+          <h1 className="text-xl font-bold text-foreground">
             {recipe.title}
           </h1>
           {recipe.description && (
-            <p className="mt-2 text-sm text-[var(--tg-theme-hint-color,#999)]">
+            <p className="mt-2 text-sm text-muted-foreground">
               {recipe.description}
             </p>
           )}
@@ -88,8 +87,8 @@ export default function RecipeDetailPage() {
 
         {/* КБЖУ */}
         {hasNutrition && (
-          <div className="rounded-xl bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] p-3">
-            <p className="mb-2 text-xs font-medium uppercase text-[var(--tg-theme-hint-color,#999)]">
+          <div className="rounded-xl bg-secondary p-3">
+            <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">
               Пищевая ценность
             </p>
             <div className="flex justify-around text-center">
@@ -112,7 +111,7 @@ export default function RecipeDetailPage() {
             {recipe.categories.map((cat) => (
               <span
                 key={cat.id}
-                className="rounded-full bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] px-3 py-1 text-xs text-[var(--tg-theme-hint-color,#999)]"
+                className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground"
               >
                 {cat.title}
               </span>
@@ -123,19 +122,19 @@ export default function RecipeDetailPage() {
         {/* Ингредиенты */}
         {recipe.recipe_ingredients.length > 0 && (
           <div>
-            <h2 className="mb-2 text-base font-semibold text-[var(--tg-theme-text-color,#333)]">
+            <h2 className="mb-2 text-base font-semibold text-foreground">
               Ингредиенты
             </h2>
             <ul className="space-y-2">
               {recipe.recipe_ingredients.map((ri) => (
                 <li
                   key={ri.id}
-                  className="flex items-center justify-between rounded-lg bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] px-3 py-2 text-sm"
+                  className="flex items-center justify-between rounded-lg bg-secondary px-3 py-2 text-sm"
                 >
-                  <span className="text-[var(--tg-theme-text-color,#333)]">
+                  <span className="text-foreground">
                     {ri.ingredient?.title ?? "—"}
                   </span>
-                  <span className="text-[var(--tg-theme-hint-color,#999)]">
+                  <span className="text-muted-foreground">
                     {ri.amount} {ri.ingredient?.unit_of_measurement ?? ""}
                   </span>
                 </li>
@@ -147,7 +146,7 @@ export default function RecipeDetailPage() {
         {/* Шаги */}
         {recipe.steps.length > 0 && (
           <div>
-            <h2 className="mb-2 text-base font-semibold text-[var(--tg-theme-text-color,#333)]">
+            <h2 className="mb-2 text-base font-semibold text-foreground">
               Приготовление
             </h2>
             <ol className="space-y-4">
@@ -156,15 +155,15 @@ export default function RecipeDetailPage() {
                 .map((step) => (
                   <li key={step.id}>
                     <div className="flex items-start gap-3">
-                      <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--tg-theme-button-color,#3390ec)] text-xs font-bold text-white">
+                      <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                         {step.step_number}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-[var(--tg-theme-text-color,#333)]">
+                        <p className="text-sm font-medium text-foreground">
                           {step.title}
                         </p>
                         {step.description && (
-                          <p className="mt-1 text-sm text-[var(--tg-theme-hint-color,#999)]">
+                          <p className="mt-1 text-sm text-muted-foreground">
                             {step.description}
                           </p>
                         )}
@@ -185,23 +184,24 @@ export default function RecipeDetailPage() {
       </div>
 
       {/* Кнопки внизу */}
-      <div className="fixed bottom-16 left-0 right-0 flex gap-3 border-t border-[var(--tg-theme-hint-color,#ddd)]/20 bg-[var(--tg-theme-bg-color,#fff)] p-4 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
-        <button
-          type="button"
+      <div className="fixed bottom-16 left-0 right-0 flex gap-3 border-t border-border/20 bg-background p-4 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+        <Button
+          variant="outline"
           onClick={() => toggleFav.mutate({ id: recipe.id, isFavorited: recipe.is_favorited })}
           disabled={toggleFav.isPending}
-          className="flex-1 rounded-xl border border-[var(--tg-theme-button-color,#3390ec)] py-3 text-sm font-medium text-[var(--tg-theme-button-color,#3390ec)] disabled:opacity-50"
+          className="flex-1 rounded-xl border-primary text-primary"
+          size="lg"
         >
           {recipe.is_favorited ? "Убрать из избранного" : "В избранное"}
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
           onClick={() => addHistory.mutate(recipe.id)}
           disabled={addHistory.isPending}
-          className="flex-1 rounded-xl bg-[var(--tg-theme-button-color,#3390ec)] py-3 text-sm font-medium text-[var(--tg-theme-button-text-color,#fff)] disabled:opacity-50"
+          className="flex-1 rounded-xl"
+          size="lg"
         >
           Приготовлено!
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -209,9 +209,9 @@ export default function RecipeDetailPage() {
 
 function MetaBadge({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] px-3 py-2 text-center">
-      <p className="text-xs text-[var(--tg-theme-hint-color,#999)]">{label}</p>
-      <p className="text-sm font-medium text-[var(--tg-theme-text-color,#333)]">
+    <div className="rounded-lg bg-secondary px-3 py-2 text-center">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium text-foreground">
         {value}
       </p>
     </div>
@@ -221,10 +221,10 @@ function MetaBadge({ label, value }: { label: string; value: string }) {
 function NutritionItem({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-sm font-medium text-[var(--tg-theme-text-color,#333)]">
+      <p className="text-sm font-medium text-foreground">
         {value}
       </p>
-      <p className="text-xs text-[var(--tg-theme-hint-color,#999)]">{label}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
 }

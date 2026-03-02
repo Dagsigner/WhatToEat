@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react";
 import { useRecipes, useToggleFavorite } from "@/features/recipes";
 import { useCategories } from "@/features/categories";
-import { RecipeCard, Spinner, EmptyState } from "@/shared/ui";
-import { cn } from "@/shared/lib/cn";
+import { RecipeCard, Spinner, EmptyState, Input } from "@/shared/ui";
+import { cn } from "@/shared/lib/utils";
 import { useDebounce } from "@/shared/lib/use-debounce";
 
 type Tab = "all" | "favorites";
@@ -46,8 +46,8 @@ export default function RecipesPage() {
             className={cn(
               "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
               tab === t
-                ? "bg-[var(--tg-theme-button-color,#3390ec)] text-[var(--tg-theme-button-text-color,#fff)]"
-                : "bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] text-[var(--tg-theme-hint-color,#999)]",
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground",
             )}
           >
             {t === "all" ? "Все" : "Избранное"}
@@ -56,12 +56,12 @@ export default function RecipesPage() {
       </div>
 
       {/* Поиск */}
-      <input
+      <Input
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Поиск рецептов…"
-        className="w-full rounded-xl border border-[var(--tg-theme-hint-color,#ddd)]/30 bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] px-4 py-2.5 text-sm text-[var(--tg-theme-text-color,#333)] outline-none placeholder:text-[var(--tg-theme-hint-color,#999)] focus:border-[var(--tg-theme-button-color,#3390ec)]"
+        className="rounded-xl bg-secondary"
       />
 
       {/* Категории */}
@@ -73,8 +73,8 @@ export default function RecipesPage() {
             className={cn(
               "flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors",
               selectedCategory === null
-                ? "bg-[var(--tg-theme-button-color,#3390ec)] text-[var(--tg-theme-button-text-color,#fff)]"
-                : "bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] text-[var(--tg-theme-hint-color,#999)]",
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground",
             )}
           >
             Все
@@ -87,8 +87,8 @@ export default function RecipesPage() {
               className={cn(
                 "flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors",
                 selectedCategory === cat.id
-                  ? "bg-[var(--tg-theme-button-color,#3390ec)] text-[var(--tg-theme-button-text-color,#fff)]"
-                  : "bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] text-[var(--tg-theme-hint-color,#999)]",
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground",
               )}
             >
               {cat.title}

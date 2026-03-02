@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { cn } from "@/shared/lib/cn";
+import { cn } from "@/shared/lib/utils";
 import { formatMinutes, formatDifficulty } from "@/shared/lib/format";
 import { getImageUrl } from "@/shared/lib/image-url";
 import type { RecipeListItem } from "@/shared/types/recipe";
@@ -23,7 +23,7 @@ export function RecipeCard({
     return (
       <Link
         href={`/recipes/${recipe.id}`}
-        className="flex-shrink-0 w-40 overflow-hidden rounded-xl bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)]"
+        className="flex-shrink-0 w-40 overflow-hidden rounded-xl bg-secondary"
       >
         <div className="relative h-28 w-full">
           <img
@@ -45,10 +45,10 @@ export function RecipeCard({
           )}
         </div>
         <div className="p-2">
-          <p className="line-clamp-2 text-sm font-medium text-[var(--tg-theme-text-color,#333)]">
+          <p className="line-clamp-2 text-sm font-medium text-foreground">
             {recipe.title}
           </p>
-          <p className="mt-1 text-xs text-[var(--tg-theme-hint-color,#999)]">
+          <p className="mt-1 text-xs text-muted-foreground">
             {formatMinutes(totalTime)}
           </p>
         </div>
@@ -59,7 +59,7 @@ export function RecipeCard({
   return (
     <Link
       href={`/recipes/${recipe.id}`}
-      className="flex gap-3 rounded-xl bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] p-3"
+      className="flex gap-3 rounded-xl bg-secondary p-3"
     >
       <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg">
         <img
@@ -70,10 +70,10 @@ export function RecipeCard({
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
-          <p className="line-clamp-2 text-sm font-medium text-[var(--tg-theme-text-color,#333)]">
+          <p className="line-clamp-2 text-sm font-medium text-foreground">
             {recipe.title}
           </p>
-          <p className="mt-1 text-xs text-[var(--tg-theme-hint-color,#999)]">
+          <p className="mt-1 text-xs text-muted-foreground">
             {formatMinutes(totalTime)} · {formatDifficulty(recipe.difficulty)}
           </p>
         </div>

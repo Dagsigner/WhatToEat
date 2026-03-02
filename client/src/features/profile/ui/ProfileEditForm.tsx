@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Input } from "@/shared/ui";
 import type { UserProfile, UserUpdateData } from "@/shared/types/user";
 
 const schema = z.object({
@@ -78,20 +79,23 @@ export function ProfileEditForm({
       />
 
       <div className="flex gap-3 pt-2">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
-          className="flex-1 rounded-xl border border-[var(--tg-theme-hint-color,#ddd)] py-3 text-sm font-medium text-[var(--tg-theme-text-color,#333)]"
+          variant="outline"
+          size="lg"
+          className="flex-1 rounded-xl"
         >
           Отмена
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={isSaving}
-          className="flex-1 rounded-xl bg-[var(--tg-theme-button-color,#3390ec)] py-3 text-sm font-medium text-[var(--tg-theme-button-text-color,#fff)] disabled:opacity-50"
+          size="lg"
+          className="flex-1 rounded-xl"
         >
           {isSaving ? "Сохранение…" : "Сохранить"}
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -107,16 +111,16 @@ interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const Field = forwardRef<HTMLInputElement, FieldProps>(
   ({ label, error, ...rest }, ref) => (
     <div>
-      <label className="mb-1 block text-sm text-[var(--tg-theme-hint-color,#999)]">
+      <label className="mb-1 block text-sm text-muted-foreground">
         {label}
       </label>
-      <input
+      <Input
         ref={ref}
-        className="w-full rounded-lg border border-[var(--tg-theme-hint-color,#ddd)]/30 bg-[var(--tg-theme-secondary-bg-color,#f5f5f5)] px-3 py-2.5 text-sm text-[var(--tg-theme-text-color,#333)] outline-none focus:border-[var(--tg-theme-button-color,#3390ec)]"
+        className="bg-secondary"
         {...rest}
       />
       {error && (
-        <p className="mt-1 text-xs text-red-500">{error}</p>
+        <p className="mt-1 text-xs text-destructive">{error}</p>
       )}
     </div>
   ),

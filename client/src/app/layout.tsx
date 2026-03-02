@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { QueryProvider } from "@/shared/providers/query-provider";
+import { ThemeSync } from "@/shared/lib/theme-sync";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const inter = Inter({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -28,9 +24,8 @@ export default function RootLayout({
       <head>
         <script src="https://telegram.org/js/telegram-web-app.js" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} antialiased`}>
+        <ThemeSync />
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
