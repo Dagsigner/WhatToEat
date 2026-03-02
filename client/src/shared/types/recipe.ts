@@ -66,6 +66,16 @@ export interface RecipeDetail {
   is_in_history: boolean;
 }
 
+export interface CookingHistoryItem {
+  id: string;
+  cooked_at: string;
+  recipe: {
+    id: string;
+    title: string;
+    photo_url: string;
+  };
+}
+
 export interface FavoriteToggleResponse {
   id: string;
   is_favorited: boolean;

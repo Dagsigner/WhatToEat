@@ -11,6 +11,7 @@ import {
   addFavorite,
   removeFavorite,
   addToHistory,
+  fetchCookingHistory,
   type FetchRecipesParams,
 } from "@/shared/api/recipes";
 
@@ -21,6 +22,7 @@ export const recipeKeys = {
     [...recipeKeys.lists(), params] as const,
   details: () => [...recipeKeys.all, "detail"] as const,
   detail: (id: string) => [...recipeKeys.details(), id] as const,
+  cookingHistory: () => [...recipeKeys.all, "cooking-history"] as const,
 };
 
 export function useRecipes(params: FetchRecipesParams = {}) {
@@ -65,5 +67,12 @@ export function useAddToHistory() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: recipeKeys.all });
     },
+  });
+}
+
+export function useCookingHistory() {
+  return useQuery({
+    queryKey: recipeKeys.cookingHistory(),
+    queryFn: fetchCookingHistory,
   });
 }

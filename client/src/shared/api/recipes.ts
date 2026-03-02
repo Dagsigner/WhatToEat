@@ -5,6 +5,7 @@ import type {
   RecipeDetail,
   FavoriteToggleResponse,
   HistoryToggleResponse,
+  CookingHistoryItem,
 } from "@/shared/types/recipe";
 
 export interface FetchRecipesParams {
@@ -50,6 +51,13 @@ export async function removeFavorite(
 export async function addToHistory(id: string): Promise<HistoryToggleResponse> {
   const { data } = await api.post<HistoryToggleResponse>(
     `/recipes/${id}/history`,
+  );
+  return data;
+}
+
+export async function fetchCookingHistory(): Promise<CookingHistoryItem[]> {
+  const { data } = await api.get<CookingHistoryItem[]>(
+    "/cooking-history/recent",
   );
   return data;
 }

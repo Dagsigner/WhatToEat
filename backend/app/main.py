@@ -16,6 +16,7 @@ from app.core.redis import close_redis, get_redis
 
 from app.api.auth import router as auth_router
 from app.api.categories import router as categories_router
+from app.api.cooking_history import router as cooking_history_router
 from app.api.files import router as files_router
 from app.api.images import router as images_router
 from app.api.ingredients import router as ingredients_router
@@ -104,6 +105,7 @@ app.include_router(users_router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1")
 app.include_router(ingredients_router, prefix="/api/v1")
 app.include_router(recipes_router, prefix="/api/v1")
+app.include_router(cooking_history_router, prefix="/api/v1")
 app.include_router(steps_router, prefix="/api/v1")
 app.include_router(files_router, prefix="/api/v1")
 app.include_router(images_router, prefix="/api/v1")

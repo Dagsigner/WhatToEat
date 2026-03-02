@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { QueryProvider } from "@/shared/providers/query-provider";
 import { ThemeSync } from "@/shared/lib/theme-sync";
+import { Toaster } from "@/shared/ui/shadcn/sonner";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <ThemeSync />
         <QueryProvider>{children}</QueryProvider>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

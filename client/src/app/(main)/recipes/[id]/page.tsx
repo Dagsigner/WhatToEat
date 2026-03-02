@@ -1,6 +1,8 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
+import axios from "axios";
 import {
   useRecipeDetail,
   useToggleFavorite,
@@ -195,7 +197,20 @@ export default function RecipeDetailPage() {
           {recipe.is_favorited ? "Убрать из избранного" : "В избранное"}
         </Button>
         <Button
-          onClick={() => addHistory.mutate(recipe.id)}
+          onClick={() =>
+            addHistory.mutate(recipe.id, {
+              onSuccess: () => {
+                toast.success("Рецепт добавлен в историю!");
+              },
+              onError: (error) => {
+                if (axios.isAxiosError(error) && error.response?.status === 409) {
+                  toast.error("Вы уже отметили блюдо сегодня");
+                } else {
+                  toast.error("Не удалось сохранить");
+                }
+              },
+            })
+          }
           disabled={addHistory.isPending}
           className="flex-1 rounded-xl"
           size="lg"

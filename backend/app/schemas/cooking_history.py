@@ -19,3 +19,15 @@ class CookingHistoryResponse(BaseModel):
     recipe_id: UUID
     cooked_at: datetime
     created_at: datetime
+
+
+class CookingHistoryRecipeInfo(BaseModel):
+    id: UUID
+    title: str
+    photo_url: str
+
+
+class CookingHistoryRecentResponse(BaseModel):
+    id: UUID
+    cooked_at: datetime
+    recipe: CookingHistoryRecipeInfo
