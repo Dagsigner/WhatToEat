@@ -25,7 +25,7 @@ export function RecipeCard({
     return (
       <Link
         href={`/recipes/${recipe.id}`}
-        className="flex-shrink-0 w-40 overflow-hidden rounded-xl bg-secondary"
+        className="w-full overflow-hidden rounded-xl bg-background"
       >
         <div className="relative h-28 w-full">
           <img

@@ -23,9 +23,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <script src="https://telegram.org/js/telegram-web-app.js" />
       </head>
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeSync />
         <QueryProvider>{children}</QueryProvider>
         <Toaster position="top-center" />

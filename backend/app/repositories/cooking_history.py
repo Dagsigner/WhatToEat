@@ -48,6 +48,6 @@ class CookingHistoryRepository(BaseRepository[CookingHistory]):
                 CookingHistory.cooked_at >= cutoff,
             )
             .options(selectinload(CookingHistory.recipe))
-            .order_by(CookingHistory.cooked_at.desc())
+            .order_by(CookingHistory.cooked_at.asc())
         )
         return list(result.scalars().all())

@@ -26,10 +26,10 @@ export default function HomePage() {
         <h2 className="text-2xl font-bold text-foreground">
           История готовки
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-base font-semibold leading-6 text-muted-foreground">
           Отображается, что вы готовили
         </p>
-        <div className="mt-3">
+        <div className="mt-4">
           {historyLoading ? (
             <Spinner />
           ) : !history?.length ? (
@@ -49,28 +49,32 @@ export default function HomePage() {
       </section>
 
       {/* Что поесть сегодня? — остров */}
-      <section className="rounded-2xl bg-secondary p-5">
+      <section className="flex flex-col gap-28 rounded-3xl bg-secondary p-2.5">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground">
+          <h2 className="text-2xl font-bold leading-8 text-card-foreground">
             Что поесть сегодня?
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-base font-semibold leading-6 text-muted-foreground">
             Подберем подходящие блюда
           </p>
         </div>
 
         {!showSuggestions ? (
-          <Button
+          <button
             onClick={() => setShowSuggestions(true)}
-            className="mt-6 w-full rounded-xl py-6 text-base"
-            size="lg"
+            className="flex w-full flex-col items-center rounded-2xl bg-primary px-4 py-3"
           >
-            Подобрать
-          </Button>
+            <span className="text-base font-semibold leading-6 text-primary-foreground">
+              Получить список блюд
+            </span>
+            <span className="text-base font-semibold leading-6 text-primary-foreground/80">
+              Подберем на основе истории
+            </span>
+          </button>
         ) : suggestionsLoading ? (
-          <Spinner className="mt-6" />
+          <Spinner />
         ) : !suggestions?.items.length ? (
-          <div className="mt-6">
+          <div>
             <EmptyState
               icon={<HugeiconsIcon icon={BookOpen01Icon} size={36} />}
               title="Рецептов пока нет"
@@ -78,7 +82,7 @@ export default function HomePage() {
             />
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5">
             {suggestions.items.map((recipe) => (
               <RecipeCard
                 key={recipe.id}

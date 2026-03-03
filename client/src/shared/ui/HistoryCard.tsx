@@ -13,25 +13,21 @@ export function HistoryCard({ item }: HistoryCardProps) {
   return (
     <Link
       href={`/recipes/${item.recipe.id}`}
-      className="flex-shrink-0 w-[123px]"
+      className="flex-shrink-0 w-[123px] flex flex-col rounded-xl bg-secondary pt-2 px-3 pb-3"
     >
-      <div className="px-3 py-2">
-        <p className="text-sm font-medium text-foreground truncate">
-          {formatRelativeDay(item.cooked_at)}
-        </p>
+      <p className="text-lg font-semibold leading-7 text-card-foreground truncate">
+        {formatRelativeDay(item.cooked_at)}
+      </p>
+      <div className="mt-3.5 h-14 w-full overflow-hidden rounded-lg border border-border">
+        <img
+          src={getImageUrl(item.recipe.photo_url)}
+          alt={item.recipe.title}
+          className="h-full w-full object-cover"
+        />
       </div>
-      <div className="px-3">
-        <div className="h-14 w-full overflow-hidden rounded-lg">
-          <img
-            src={getImageUrl(item.recipe.photo_url)}
-            alt={item.recipe.title}
-            className="h-full w-full object-cover"
-          />
-        </div>
-        <p className="mt-1 text-xs text-muted-foreground truncate">
-          {item.recipe.title}
-        </p>
-      </div>
+      <p className="mt-1 text-xs font-semibold leading-4 text-muted-foreground truncate">
+        {item.recipe.title}
+      </p>
     </Link>
   );
 }
