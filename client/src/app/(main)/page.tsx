@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCookingHistory, useRecipes, useToggleFavorite } from "@/features/recipes";
 import { RecipeCard, HistoryCard, Spinner, EmptyState, Button } from "@/shared/ui";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -14,6 +14,13 @@ export default function HomePage() {
     limit: 4,
   });
   const toggleFav = useToggleFavorite();
+  const historyRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (history?.length && historyRef.current) {
+      historyRef.current.scrollLeft = historyRef.current.scrollWidth;
+    }
+  }, [history]);
 
   const handleFavorite = (id: string, current: boolean) => {
     toggleFav.mutate({ id, isFavorited: current });
@@ -39,7 +46,7 @@ export default function HomePage() {
               description="Отмечайте рецепты как приготовленные"
             />
           ) : (
-            <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
+            <div ref={historyRef} className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
               {history.map((item) => (
                 <HistoryCard key={item.id} item={item} />
               ))}

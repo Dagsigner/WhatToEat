@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { QueryProvider } from "@/shared/providers/query-provider";
 import { ThemeSync } from "@/shared/lib/theme-sync";
@@ -9,6 +9,12 @@ const inter = Inter({
   subsets: ["latin", "cyrillic"],
   variable: "--font-sans",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "Что поесть?",
@@ -23,7 +29,6 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <script src="https://telegram.org/js/telegram-web-app.js" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
