@@ -215,7 +215,7 @@ export default function RecipeDetailPage() {
           className="flex-1 rounded-xl"
           size="lg"
         >
-          Приготовлено!
+          Готовлю сегодня
         </Button>
       </div>
     </div>

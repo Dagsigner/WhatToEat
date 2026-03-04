@@ -16,6 +16,7 @@ env/
 # IDE
 .vscode/
 .idea/
+.mcp.json
 
 # Claude Code
 .claude/
