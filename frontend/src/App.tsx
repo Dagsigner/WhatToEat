@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +16,11 @@ const UsersListPage = lazy(() => import("@/pages/users/list"));
 const UserDetailPage = lazy(() => import("@/pages/users/detail"));
 const ImagesListPage = lazy(() => import("@/pages/images/list"));
 const StepsListPage = lazy(() => import("@/pages/steps/list"));
+
+function RecipeFormKeyed() {
+  const { id } = useParams();
+  return <RecipeFormPage key={id ?? "new"} />;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,8 +39,8 @@ export default function App() {
               <Route element={<AppLayout />}>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/recipes" element={<RecipesListPage />} />
-                <Route path="/recipes/new" element={<RecipeFormPage />} />
-                <Route path="/recipes/:id/edit" element={<RecipeFormPage />} />
+                <Route path="/recipes/new" element={<RecipeFormKeyed />} />
+                <Route path="/recipes/:id/edit" element={<RecipeFormKeyed />} />
                 <Route path="/categories" element={<CategoriesListPage />} />
                 <Route path="/ingredients" element={<IngredientsListPage />} />
                 <Route path="/users" element={<UsersListPage />} />

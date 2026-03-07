@@ -117,11 +117,12 @@ export default function RecipeFormPage() {
   const [pickIngId, setPickIngId] = useState("");
   const [pickAmount, setPickAmount] = useState(1);
 
-  // populate relations on first recipe load
+  // populate relations and unregistered Select fields on first recipe load
   const [relationsLoaded, setRelationsLoaded] = useState(false);
   useEffect(() => {
     if (recipe && !relationsLoaded) {
       setRelationsLoaded(true);
+      setValue("difficulty", recipe.difficulty);
       setSelectedCategoryIds(recipe.categories.map((c) => c.id));
       setIngredientRows(
         recipe.recipe_ingredients.map((ri: RecipeIngredientResponse) => ({
@@ -132,7 +133,7 @@ export default function RecipeFormPage() {
         })),
       );
     }
-  }, [recipe, relationsLoaded]);
+  }, [recipe, relationsLoaded, setValue]);
 
   // save recipe
   const mutation = useMutation({

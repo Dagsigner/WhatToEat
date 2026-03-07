@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useRecipes, useToggleFavorite } from "@/features/recipes";
+import { useState, useMemo, useRef, useCallback } from "react";
+import { useInfiniteRecipes, useToggleFavorite } from "@/features/recipes";
 import { useCategories } from "@/features/categories";
 import { RecipeCard, Spinner, EmptyState, Input } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
@@ -28,9 +28,24 @@ export default function RecipesPage() {
     [debouncedSearch, selectedCategory, tab],
   );
 
-  const { data, isLoading } = useRecipes(params);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteRecipes(params);
   const { data: categories } = useCategories();
   const toggleFav = useToggleFavorite();
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) observerRef.current.disconnect();
+      if (!node || !hasNextPage) return;
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      });
+      observerRef.current.observe(node);
+    },
+    [hasNextPage, fetchNextPage],
+  );
+
+  const recipes = data?.pages.flatMap((p) => p.items) ?? [];
 
   const handleFavorite = (id: string, current: boolean) => {
     toggleFav.mutate({ id, isFavorited: current });
@@ -102,7 +117,7 @@ export default function RecipesPage() {
       {/* Список */}
       {isLoading ? (
         <Spinner />
-      ) : !data?.items.length ? (
+      ) : !recipes.length ? (
         <EmptyState
           icon={<HugeiconsIcon icon={tab === "favorites" ? HeartbreakIcon : Search01Icon} size={36} />}
           title={tab === "favorites" ? "Нет избранных рецептов" : "Ничего не найдено"}
@@ -114,7 +129,7 @@ export default function RecipesPage() {
         />
       ) : (
         <div className="space-y-3">
-          {data.items.map((recipe) => (
+          {recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
@@ -122,6 +137,8 @@ export default function RecipesPage() {
               onFavoriteToggle={handleFavorite}
             />
           ))}
+          <div ref={sentinelRef} className="h-1" />
+          {isFetchingNextPage && <Spinner />}
         </div>
       )}
     </div>

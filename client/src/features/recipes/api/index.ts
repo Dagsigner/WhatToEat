@@ -2,6 +2,7 @@
 
 import {
   useQuery,
+  useInfiniteQuery,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
@@ -29,6 +30,19 @@ export function useRecipes(params: FetchRecipesParams = {}) {
   return useQuery({
     queryKey: recipeKeys.list(params),
     queryFn: () => fetchRecipes(params),
+  });
+}
+
+export function useInfiniteRecipes(params: Omit<FetchRecipesParams, "offset"> = {}) {
+  const limit = params.limit ?? 20;
+  return useInfiniteQuery({
+    queryKey: [...recipeKeys.lists(), "infinite", params] as const,
+    queryFn: ({ pageParam = 0 }) => fetchRecipes({ ...params, limit, offset: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      const next = lastPage.offset + lastPage.limit;
+      return next < lastPage.total ? next : undefined;
+    },
   });
 }
 

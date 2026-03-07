@@ -1,5 +1,6 @@
 export {
   useRecipes,
+  useInfiniteRecipes,
   useRecipeDetail,
   useHistoryRecipes,
   useToggleFavorite,
