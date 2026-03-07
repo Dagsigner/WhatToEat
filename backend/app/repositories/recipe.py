@@ -34,11 +34,18 @@ class RecipeRepository(BaseRepository[Recipe]):
         )
         return result.scalar_one_or_none()
 
+    SORT_OPTIONS = {
+        "title_asc": Recipe.title.asc(),
+        "title_desc": Recipe.title.desc(),
+        "created_at_desc": Recipe.created_at.desc(),
+    }
+
     async def list_admin(
         self, pagination: PaginationParams, *,
         search: str | None = None, is_active: bool | None = None,
         slug: str | None = None, difficulty: str | None = None,
         category_id: UUID | None = None,
+        sort_by: str | None = None,
     ) -> PaginatedResponse[Recipe]:
         filters: list[Any] = []
         if search:
@@ -65,9 +72,11 @@ class RecipeRepository(BaseRepository[Recipe]):
             for f in filters:
                 count_query = count_query.where(f)
 
+        order = self.SORT_OPTIONS.get(sort_by, Recipe.created_at.desc())
+
         return await self.list(
             pagination, base_query=query, count_query=count_query,
-            order_by=Recipe.created_at.desc(),
+            order_by=order,
         )
 
     async def list_client(

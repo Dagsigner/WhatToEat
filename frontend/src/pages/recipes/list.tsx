@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -12,20 +12,38 @@ import { PageHeader } from "@/components/shared/page-header";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { listRecipes, deleteRecipe } from "@/api/recipes";
+import { listCategories } from "@/api/categories";
 import type { RecipeAdmin } from "@/types";
 import { toast } from "sonner";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 export default function RecipesListPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
   const limit = 20;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["recipes", page, search],
-    queryFn: () => listRecipes(limit, page * limit, search || undefined),
+  const { data: categories } = useQuery({
+    queryKey: ["categories-all"],
+    queryFn: () => listCategories(100, 0),
   });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["recipes", page, search, sortBy, categoryId],
+    queryFn: () => listRecipes(limit, page * limit, search || undefined, sortBy, categoryId),
+  });
+
+  const toggleTitleSort = () => {
+    setSortBy((prev) =>
+      prev === "title_asc" ? "title_desc" : prev === "title_desc" ? undefined : "title_asc",
+    );
+    setPage(0);
+  };
 
   const [deleteTarget, setDeleteTarget] = useState<RecipeAdmin | null>(null);
 
@@ -60,7 +78,20 @@ export default function RecipesListPage() {
         description="Manage recipes"
         action={<Button onClick={() => navigate("/recipes/new")}><Plus className="mr-2 h-4 w-4" /> New Recipe</Button>}
       />
-      <Input placeholder="Search recipes..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }} className="max-w-sm" />
+      <div className="flex gap-3 items-center">
+        <Input placeholder="Search recipes..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }} className="max-w-sm" />
+        <Select value={categoryId ?? "all"} onValueChange={(v) => { setCategoryId(v === "all" ? undefined : v); setPage(0); }}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="All categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All categories</SelectItem>
+            {categories?.items.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       {isLoading ? <LoadingSpinner /> : (
         <>
           <div className="rounded-md border">
@@ -68,7 +99,12 @@ export default function RecipesListPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-14">Photo</TableHead>
-                  <TableHead>Title</TableHead>
+                  <TableHead>
+                    <button className="inline-flex items-center gap-1 hover:text-foreground" onClick={toggleTitleSort}>
+                      Title
+                      {sortBy === "title_asc" ? <ArrowUp className="h-3 w-3" /> : sortBy === "title_desc" ? <ArrowDown className="h-3 w-3" /> : <ArrowUpDown className="h-3 w-3 text-muted-foreground" />}
+                    </button>
+                  </TableHead>
                   <TableHead>Difficulty</TableHead>
                   <TableHead>Prep / Cook</TableHead>
                   <TableHead>Status</TableHead>

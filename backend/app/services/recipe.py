@@ -58,12 +58,12 @@ class RecipeService:
         self, pagination: PaginationParams, *,
         difficulty: str | None = None, search: str | None = None,
         is_active: bool | None = None, category_id: UUID | None = None,
-        slug: str | None = None,
+        slug: str | None = None, sort_by: str | None = None,
     ) -> PaginatedResponse[Recipe]:
         """Return a paginated admin list of recipes with optional filters."""
         return await self.repo.list_admin(
             pagination, search=search, is_active=is_active, slug=slug,
-            difficulty=difficulty, category_id=category_id,
+            difficulty=difficulty, category_id=category_id, sort_by=sort_by,
         )
 
     async def list_client(

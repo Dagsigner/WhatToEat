@@ -12,9 +12,13 @@ export async function listRecipes(
   limit = 20,
   offset = 0,
   search?: string,
+  sort_by?: string,
+  category_id?: string,
 ): Promise<PaginatedResponse<RecipeAdmin>> {
   const params: Record<string, unknown> = { limit, offset };
   if (search) params.search = search;
+  if (sort_by) params.sort_by = sort_by;
+  if (category_id) params.category_id = category_id;
   const res = await apiClient.get<PaginatedResponse<RecipeAdmin>>("/recipes/admin", { params });
   return res.data;
 }

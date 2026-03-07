@@ -60,11 +60,13 @@ async def list_recipes_admin(
     slug: str | None = Query(None),
     is_active: bool | None = Query(None),
     category_id: UUID | None = Query(None),
+    sort_by: str | None = Query(None),
     _admin: User = Depends(get_current_admin),
     service: RecipeService = Depends(get_recipe_service),
 ) -> PaginatedResponse[Recipe]:
     return await service.list(
-        pagination, search=search, slug=slug, is_active=is_active, category_id=category_id,
+        pagination, search=search, slug=slug, is_active=is_active,
+        category_id=category_id, sort_by=sort_by,
     )
 
 
