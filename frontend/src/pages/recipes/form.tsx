@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -78,13 +78,23 @@ export default function RecipeFormPage() {
   });
 
   // form
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isSubmitting } } = useForm<RecipeFormData>({
+  const recipeValues = recipe ? {
+    title: recipe.title, slug: recipe.slug, photo_url: recipe.photo_url,
+    description: recipe.description, prep_time: recipe.prep_time,
+    cook_time: recipe.cook_time, difficulty: recipe.difficulty,
+    servings: recipe.servings, protein: recipe.protein, fat: recipe.fat,
+    carbs: recipe.carbs, is_active: recipe.is_active,
+  } : undefined;
+
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting, isSubmitted } } = useForm<RecipeFormData>({
     resolver: zodResolver(recipeSchema) as never,
     defaultValues: {
       title: "", slug: "", photo_url: "", description: "",
       prep_time: 0, cook_time: 0, difficulty: "medium", servings: "",
       protein: null, fat: null, carbs: null, is_active: true,
     },
+    values: recipeValues,
+    resetOptions: { keepDirtyValues: true },
   });
 
   // local state for relations
@@ -107,19 +117,11 @@ export default function RecipeFormPage() {
   const [pickIngId, setPickIngId] = useState("");
   const [pickAmount, setPickAmount] = useState(1);
 
-  const lastLoadedRecipeIdRef = useRef<string | null>(null);
-
-  // populate form on recipe load — only when recipe id changes (not on refetch)
+  // populate relations on first recipe load
+  const [relationsLoaded, setRelationsLoaded] = useState(false);
   useEffect(() => {
-    if (recipe && recipe.id !== lastLoadedRecipeIdRef.current) {
-      lastLoadedRecipeIdRef.current = recipe.id;
-      reset({
-        title: recipe.title, slug: recipe.slug, photo_url: recipe.photo_url,
-        description: recipe.description, prep_time: recipe.prep_time,
-        cook_time: recipe.cook_time, difficulty: recipe.difficulty,
-        servings: recipe.servings, protein: recipe.protein, fat: recipe.fat,
-        carbs: recipe.carbs, is_active: recipe.is_active,
-      });
+    if (recipe && !relationsLoaded) {
+      setRelationsLoaded(true);
       setSelectedCategoryIds(recipe.categories.map((c) => c.id));
       setIngredientRows(
         recipe.recipe_ingredients.map((ri: RecipeIngredientResponse) => ({
@@ -130,7 +132,7 @@ export default function RecipeFormPage() {
         })),
       );
     }
-  }, [recipe, reset]);
+  }, [recipe, relationsLoaded]);
 
   // save recipe
   const mutation = useMutation({
@@ -221,7 +223,11 @@ export default function RecipeFormPage() {
   return (
     <div className="space-y-6">
       <PageHeader title={isEdit ? "Edit Recipe" : "New Recipe"} />
-      <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-6 max-w-3xl">
+      <form onSubmit={handleSubmit((d) => mutation.mutate(d), () => {
+        toast.error("Please fill in all required fields");
+        const firstError = document.querySelector(".border-destructive");
+        firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+      })} className="space-y-6 max-w-3xl">
 
         {/* ===== BASIC INFO ===== */}
         <Card>
@@ -230,12 +236,12 @@ export default function RecipeFormPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Title</Label>
-                <Input {...register("title")} />
+                <Input {...register("title")} className={errors.title ? "border-destructive" : ""} />
                 {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label>Slug</Label>
-                <Input {...register("slug")} />
+                <Input {...register("slug")} className={errors.slug ? "border-destructive" : ""} />
                 {errors.slug && <p className="text-sm text-destructive">{errors.slug.message}</p>}
               </div>
             </div>
@@ -249,7 +255,7 @@ export default function RecipeFormPage() {
             </div>
             <div className="space-y-2">
               <Label>Description</Label>
-              <Textarea rows={4} {...register("description")} />
+              <Textarea rows={4} {...register("description")} className={errors.description ? "border-destructive" : ""} />
               {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
             </div>
             <div className="grid grid-cols-3 gap-4">
@@ -266,7 +272,7 @@ export default function RecipeFormPage() {
               </div>
               <div className="space-y-2">
                 <Label>Servings</Label>
-                <Input {...register("servings")} />
+                <Input {...register("servings")} className={errors.servings ? "border-destructive" : ""} />
               </div>
               <div className="flex items-end gap-2 pb-1">
                 <Switch id="active" checked={watch("is_active")} onCheckedChange={(v) => setValue("is_active", v)} />

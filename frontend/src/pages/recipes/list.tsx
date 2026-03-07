@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Plus, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,11 +22,27 @@ import {
 export default function RecipesListPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-  const [categoryId, setCategoryId] = useState<string | undefined>(undefined);
+  const [searchParams, setSearchParams] = useSearchParams();
   const limit = 20;
+
+  const search = searchParams.get("search") ?? "";
+  const page = Number(searchParams.get("page") ?? "0");
+  const sortBy = searchParams.get("sort_by") ?? undefined;
+  const categoryId = searchParams.get("category_id") ?? undefined;
+
+  const updateParams = useCallback((updates: Record<string, string | undefined>) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === undefined || value === "") {
+          next.delete(key);
+        } else {
+          next.set(key, value);
+        }
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const { data: categories } = useQuery({
     queryKey: ["categories-all"],
@@ -39,10 +55,8 @@ export default function RecipesListPage() {
   });
 
   const toggleTitleSort = () => {
-    setSortBy((prev) =>
-      prev === "title_asc" ? "title_desc" : prev === "title_desc" ? undefined : "title_asc",
-    );
-    setPage(0);
+    const next = sortBy === "title_asc" ? "title_desc" : sortBy === "title_desc" ? undefined : "title_asc";
+    updateParams({ sort_by: next, page: undefined });
   };
 
   const [deleteTarget, setDeleteTarget] = useState<RecipeAdmin | null>(null);
@@ -79,8 +93,8 @@ export default function RecipesListPage() {
         action={<Button onClick={() => navigate("/recipes/new")}><Plus className="mr-2 h-4 w-4" /> New Recipe</Button>}
       />
       <div className="flex gap-3 items-center">
-        <Input placeholder="Search recipes..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(0); }} className="max-w-sm" />
-        <Select value={categoryId ?? "all"} onValueChange={(v) => { setCategoryId(v === "all" ? undefined : v); setPage(0); }}>
+        <Input placeholder="Search recipes..." value={search} onChange={(e) => updateParams({ search: e.target.value, page: undefined })} className="max-w-sm" />
+        <Select value={categoryId ?? "all"} onValueChange={(v) => updateParams({ category_id: v === "all" ? undefined : v, page: undefined })}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
@@ -154,8 +168,8 @@ export default function RecipesListPage() {
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">Total: {data?.total ?? 0}</span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(page - 1)}>Previous</Button>
-              <Button variant="outline" size="sm" disabled={(data?.total ?? 0) <= (page + 1) * limit} onClick={() => setPage(page + 1)}>Next</Button>
+              <Button variant="outline" size="sm" disabled={page === 0} onClick={() => updateParams({ page: String(page - 1) })}>Previous</Button>
+              <Button variant="outline" size="sm" disabled={(data?.total ?? 0) <= (page + 1) * limit} onClick={() => updateParams({ page: String(page + 1) })}>Next</Button>
             </div>
           </div>
         </>
