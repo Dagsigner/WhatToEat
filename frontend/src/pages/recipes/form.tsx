@@ -86,7 +86,7 @@ export default function RecipeFormPage() {
     carbs: recipe.carbs, is_active: recipe.is_active,
   } : undefined;
 
-  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting, isSubmitted } } = useForm<RecipeFormData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<RecipeFormData>({
     resolver: zodResolver(recipeSchema) as never,
     defaultValues: {
       title: "", slug: "", photo_url: "", description: "",
