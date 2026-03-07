@@ -22,6 +22,8 @@ COPY --from=base /usr/local/bin /usr/local/bin
 COPY app/ app/
 COPY alembic/ alembic/
 COPY alembic.ini .
+COPY scripts/ scripts/
+COPY data/ data/
 
 COPY uploads/ uploads-seed/
 
@@ -29,4 +31,4 @@ RUN mkdir -p uploads
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "if [ -z \"$(ls -A uploads/ 2>/dev/null)\" ]; then cp -r uploads-seed/* uploads/; fi && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"]
+CMD ["sh", "-c", "if [ -z \"$(ls -A uploads/ 2>/dev/null)\" ]; then cp -r uploads-seed/* uploads/; fi && alembic upgrade head && python scripts/seed_recipes.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"]
