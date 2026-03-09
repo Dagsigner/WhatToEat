@@ -258,7 +258,7 @@ export default function RecipeFormPage() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Difficulty</Label>
-                <Select value={watch("difficulty")} onValueChange={(v) => setValue("difficulty", v)}>
+                <Select key={recipe?.id ?? "new"} value={watch("difficulty")} onValueChange={(v) => setValue("difficulty", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="easy">Easy</SelectItem>
