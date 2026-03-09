@@ -11,10 +11,11 @@ import {
 import { PageHeader } from "@/components/shared/page-header";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { listRecipes, deleteRecipe, toggleFeatured, syncFeatured } from "@/api/recipes";
+import { listRecipes, deleteRecipe, updateRecipe, toggleFeatured, syncFeatured } from "@/api/recipes";
 import { listCategories } from "@/api/categories";
 import type { RecipeAdmin } from "@/types";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -104,6 +105,20 @@ export default function RecipesListPage() {
     onError: () => toast.error("Ошибка синхронизации"),
   });
 
+  const toggleActiveMutation = useMutation({
+    mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
+      updateRecipe(id, { is_active }),
+    onMutate: async ({ id, is_active }) => {
+      await queryClient.cancelQueries({ queryKey: ["recipes"] });
+      queryClient.setQueriesData(
+        { queryKey: ["recipes"] },
+        (old: any) => old ? { ...old, items: old.items.map((r: any) => r.id === id ? { ...r, is_active } : r) } : old,
+      );
+    },
+    onError: () => toast.error("Не удалось изменить статус"),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["recipes"] }),
+  });
+
   return (
     <div className="space-y-4">
       <PageHeader
@@ -147,15 +162,18 @@ export default function RecipesListPage() {
                     </button>
                   </TableHead>
                   <TableHead>Difficulty</TableHead>
-                  <TableHead>Prep / Cook</TableHead>
+                  <TableHead>Categories</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="w-24">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.items.map((r) => (
-                  <TableRow key={r.id}>
+                {data?.items
+                  .slice()
+                  .sort((a, b) => Number(b.is_active) - Number(a.is_active))
+                  .map((r) => (
+                  <TableRow key={r.id} className={r.is_active ? "" : "opacity-40"}>
                     <TableCell>
                       {r.photo_url ? (
                         <img
@@ -171,11 +189,20 @@ export default function RecipesListPage() {
                     <TableCell>
                       <Badge variant="outline">{r.difficulty}</Badge>
                     </TableCell>
-                    <TableCell>{r.prep_time}m / {r.cook_time}m</TableCell>
                     <TableCell>
-                      <Badge variant={r.is_active ? "default" : "secondary"}>
-                        {r.is_active ? "Active" : "Inactive"}
-                      </Badge>
+                      <div className="flex flex-wrap gap-1">
+                        {r.categories.length > 0
+                          ? r.categories.map((c) => (
+                              <Badge key={c.id} variant="secondary" className="text-xs">{c.title}</Badge>
+                            ))
+                          : <span className="text-muted-foreground text-xs">—</span>}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={r.is_active}
+                        onCheckedChange={(checked) => toggleActiveMutation.mutate({ id: r.id, is_active: checked })}
+                      />
                     </TableCell>
                     <TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>

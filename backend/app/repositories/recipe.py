@@ -60,7 +60,9 @@ class RecipeRepository(BaseRepository[Recipe]):
         if is_featured is not None:
             filters.append(Recipe.is_featured == is_featured)
 
-        query: Select[tuple[Recipe]] = select(Recipe)
+        query: Select[tuple[Recipe]] = select(Recipe).options(
+            selectinload(Recipe.recipe_categories).selectinload(RecipeCategory.category),
+        )
         count_query = select(func.count()).select_from(Recipe)
 
         for f in filters:

@@ -78,23 +78,13 @@ export default function RecipeFormPage() {
   });
 
   // form
-  const recipeValues = recipe ? {
-    title: recipe.title, slug: recipe.slug, photo_url: recipe.photo_url,
-    description: recipe.description, prep_time: recipe.prep_time,
-    cook_time: recipe.cook_time, difficulty: recipe.difficulty,
-    servings: recipe.servings, protein: recipe.protein, fat: recipe.fat,
-    carbs: recipe.carbs, is_active: recipe.is_active,
-  } : undefined;
-
-  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<RecipeFormData>({
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm<RecipeFormData>({
     resolver: zodResolver(recipeSchema) as never,
     defaultValues: {
       title: "", slug: "", photo_url: "", description: "",
       prep_time: 0, cook_time: 0, difficulty: "medium", servings: "",
       protein: null, fat: null, carbs: null, is_active: true,
     },
-    values: recipeValues,
-    resetOptions: { keepDirtyValues: true },
   });
 
   // local state for relations
@@ -117,12 +107,18 @@ export default function RecipeFormPage() {
   const [pickIngId, setPickIngId] = useState("");
   const [pickAmount, setPickAmount] = useState(1);
 
-  // populate relations and unregistered Select fields on first recipe load
+  // populate form and relations on first recipe load
   const [relationsLoaded, setRelationsLoaded] = useState(false);
   useEffect(() => {
     if (recipe && !relationsLoaded) {
       setRelationsLoaded(true);
-      setValue("difficulty", recipe.difficulty);
+      reset({
+        title: recipe.title, slug: recipe.slug, photo_url: recipe.photo_url,
+        description: recipe.description, prep_time: recipe.prep_time,
+        cook_time: recipe.cook_time, difficulty: recipe.difficulty,
+        servings: recipe.servings, protein: recipe.protein, fat: recipe.fat,
+        carbs: recipe.carbs, is_active: recipe.is_active,
+      });
       setSelectedCategoryIds(recipe.categories.map((c) => c.id));
       setIngredientRows(
         recipe.recipe_ingredients.map((ri: RecipeIngredientResponse) => ({
@@ -133,7 +129,7 @@ export default function RecipeFormPage() {
         })),
       );
     }
-  }, [recipe, relationsLoaded, setValue]);
+  }, [recipe, relationsLoaded, reset]);
 
   // save recipe
   const mutation = useMutation({

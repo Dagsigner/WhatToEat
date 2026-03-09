@@ -118,6 +118,7 @@ export interface RecipeAdmin {
   is_featured: boolean;
   created_at: string;
   updated_at: string;
+  categories: CategoryResponse[];
 }
 
 export interface FeaturedToggleResponse {

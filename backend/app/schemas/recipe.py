@@ -101,6 +101,7 @@ class RecipeAdminListResponse(BaseModel):
     is_featured: bool
     created_at: datetime
     updated_at: datetime
+    categories: list[CategoryResponse] = []
 
 
 class FeaturedToggleResponse(BaseModel):
