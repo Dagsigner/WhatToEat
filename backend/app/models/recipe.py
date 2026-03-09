@@ -40,12 +40,15 @@ class Recipe(UUIDMixin, TimestampMixin, Base):
 
     steps: Mapped[list["Step"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
         back_populates="recipe", lazy="raise", order_by="Step.step_number",
+        passive_deletes=True,
     )
     recipe_ingredients: Mapped[list["RecipeIngredient"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
         back_populates="recipe", lazy="raise",
+        passive_deletes=True,
     )
     recipe_categories: Mapped[list["RecipeCategory"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
         back_populates="recipe", lazy="raise",
+        passive_deletes=True,
     )
 
     @property
@@ -53,7 +56,9 @@ class Recipe(UUIDMixin, TimestampMixin, Base):
         return [rc.category for rc in self.recipe_categories]
     favorite_recipes: Mapped[list["FavoriteRecipe"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
         back_populates="recipe", lazy="raise",
+        passive_deletes=True,
     )
     cooking_history: Mapped[list["CookingHistory"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
         back_populates="recipe", lazy="raise",
+        passive_deletes=True,
     )
