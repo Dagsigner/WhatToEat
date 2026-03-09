@@ -142,7 +142,7 @@ class RecipeService:
 
     async def delete(self, recipe_id: UUID) -> None:
         """Delete a recipe and all its associations; raises NotFoundException."""
-        recipe = await self.get_by_id(recipe_id)
+        recipe = await self.repo.get_by_id(recipe_id)
         await self.repo.delete(recipe)
         logger.info("recipe_deleted", recipe_id=str(recipe_id))
 

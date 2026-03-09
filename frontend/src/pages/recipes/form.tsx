@@ -211,7 +211,7 @@ export default function RecipeFormPage() {
     setIngredientRows(ingredientRows.map((r) => r.ingredient_id === ingId ? { ...r, amount } : r));
   };
 
-  if (isEdit && isLoading) return <LoadingSpinner />;
+  if (isEdit && (isLoading || !relationsLoaded)) return <LoadingSpinner />;
 
   const availableIngredients = ingredientsData?.items.filter(
     (i) => !ingredientRows.some((r) => r.ingredient_id === i.id),
