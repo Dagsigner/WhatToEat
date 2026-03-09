@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from uuid import UUID
 
 import structlog
+from sqlalchemy import select
 
 from app.core.dependencies import PaginationParams
 from app.core.exceptions import NotFoundException
 from app.models.category import RecipeCategory
+from app.models.dismissed_featured import UserDismissedFeatured
+from app.models.favorite import FavoriteRecipe
+from app.models.featured_sync import FeaturedSyncConfig
 from app.models.ingredient import RecipeIngredient
 from app.models.recipe import Recipe
+from app.models.user import User
 from app.repositories.recipe import RecipeRepository
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.recipe import (
@@ -59,12 +65,23 @@ class RecipeService:
         difficulty: str | None = None, search: str | None = None,
         is_active: bool | None = None, category_id: UUID | None = None,
         slug: str | None = None, sort_by: str | None = None,
+        is_featured: bool | None = None,
     ) -> PaginatedResponse[Recipe]:
         """Return a paginated admin list of recipes with optional filters."""
         return await self.repo.list_admin(
             pagination, search=search, is_active=is_active, slug=slug,
             difficulty=difficulty, category_id=category_id, sort_by=sort_by,
+            is_featured=is_featured,
         )
+
+    async def toggle_featured(self, recipe_id: UUID) -> Recipe:
+        """Toggle is_featured flag on a recipe."""
+        recipe = await self.get_by_id(recipe_id)
+        recipe.is_featured = not recipe.is_featured
+        recipe.featured_at = datetime.now(timezone.utc) if recipe.is_featured else None
+        await self.repo.flush()
+        logger.info("recipe_featured_toggled", recipe_id=str(recipe_id), is_featured=recipe.is_featured)
+        return recipe
 
     async def list_client(
         self, pagination: PaginationParams, user_id: UUID, *,
@@ -128,3 +145,80 @@ class RecipeService:
         recipe = await self.get_by_id(recipe_id)
         await self.repo.delete(recipe)
         logger.info("recipe_deleted", recipe_id=str(recipe_id))
+
+    async def sync_featured_to_users(self) -> int:
+        """Sync new featured recipes to all users' favorites.
+
+        Only adds recipes that became featured after the last sync.
+        Skips recipes already in user's favorites or dismissed by the user.
+        Returns the number of new favorite entries created.
+        """
+        db = self.repo.db
+
+        # 1. Get last sync timestamp
+        config_result = await db.execute(
+            select(FeaturedSyncConfig).where(FeaturedSyncConfig.id == 1)
+        )
+        config = config_result.scalar_one_or_none()
+        if config is None:
+            config = FeaturedSyncConfig(id=1)
+            db.add(config)
+            await db.flush()
+
+        last_sync_at = config.last_sync_at
+
+        # 2. Get recipes that became featured after last sync
+        new_featured_result = await db.execute(
+            select(Recipe.id).where(
+                Recipe.is_featured.is_(True),
+                Recipe.is_active.is_(True),
+                Recipe.featured_at.isnot(None),
+                Recipe.featured_at > last_sync_at,
+            )
+        )
+        new_recipe_ids = list(new_featured_result.scalars().all())
+
+        if not new_recipe_ids:
+            logger.info("featured_sync_no_new_recipes")
+            return 0
+
+        # 3. Get all user IDs
+        all_users_result = await db.execute(select(User.id))
+        all_user_ids = list(all_users_result.scalars().all())
+
+        # 4. Get existing favorites for these recipes (to skip)
+        existing_favs_result = await db.execute(
+            select(FavoriteRecipe.user_id, FavoriteRecipe.recipe_id).where(
+                FavoriteRecipe.recipe_id.in_(new_recipe_ids)
+            )
+        )
+        existing_favs = {(row.user_id, row.recipe_id) for row in existing_favs_result}
+
+        # 5. Get dismissed entries for these recipes (to skip)
+        dismissed_result = await db.execute(
+            select(UserDismissedFeatured.user_id, UserDismissedFeatured.recipe_id).where(
+                UserDismissedFeatured.recipe_id.in_(new_recipe_ids)
+            )
+        )
+        dismissed = {(row.user_id, row.recipe_id) for row in dismissed_result}
+
+        # 6. Create new favorites
+        added = 0
+        for user_id in all_user_ids:
+            for recipe_id in new_recipe_ids:
+                pair = (user_id, recipe_id)
+                if pair not in existing_favs and pair not in dismissed:
+                    db.add(FavoriteRecipe(user_id=user_id, recipe_id=recipe_id))
+                    added += 1
+
+        # 7. Update last_sync_at
+        config.last_sync_at = datetime.now(timezone.utc)
+        await db.flush()
+
+        logger.info(
+            "featured_sync_completed",
+            new_recipes=len(new_recipe_ids),
+            users=len(all_user_ids),
+            added=added,
+        )
+        return added

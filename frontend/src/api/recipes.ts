@@ -1,5 +1,7 @@
 import apiClient from "./client";
 import type {
+  FeaturedSyncResponse,
+  FeaturedToggleResponse,
   PaginatedResponse,
   RecipeAdmin,
   RecipeCreate,
@@ -40,5 +42,15 @@ export async function updateRecipe(id: string, data: RecipeUpdate): Promise<Reci
 
 export async function deleteRecipe(id: string): Promise<RecipeDeleteResponse> {
   const res = await apiClient.delete<RecipeDeleteResponse>(`/recipes/${id}/admin`);
+  return res.data;
+}
+
+export async function toggleFeatured(id: string): Promise<FeaturedToggleResponse> {
+  const res = await apiClient.patch<FeaturedToggleResponse>(`/recipes/${id}/admin/featured`);
+  return res.data;
+}
+
+export async function syncFeatured(): Promise<FeaturedSyncResponse> {
+  const res = await apiClient.post<FeaturedSyncResponse>("/recipes/admin/sync-featured");
   return res.data;
 }

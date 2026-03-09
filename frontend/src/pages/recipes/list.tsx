@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Plus, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Heart, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import {
 import { PageHeader } from "@/components/shared/page-header";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { listRecipes, deleteRecipe } from "@/api/recipes";
+import { listRecipes, deleteRecipe, toggleFeatured, syncFeatured } from "@/api/recipes";
 import { listCategories } from "@/api/categories";
 import type { RecipeAdmin } from "@/types";
 import { toast } from "sonner";
@@ -61,6 +61,19 @@ export default function RecipesListPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<RecipeAdmin | null>(null);
 
+  const featuredMutation = useMutation({
+    mutationFn: (id: string) => toggleFeatured(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["recipes"] });
+      queryClient.setQueriesData(
+        { queryKey: ["recipes"] },
+        (old: any) => old ? { ...old, items: old.items.map((r: any) => r.id === id ? { ...r, is_featured: !r.is_featured } : r) } : old,
+      );
+    },
+    onError: () => toast.error("Failed to toggle featured"),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["recipes"] }),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteRecipe(id),
     onMutate: async (id) => {
@@ -85,12 +98,26 @@ export default function RecipesListPage() {
     },
   });
 
+  const syncMutation = useMutation({
+    mutationFn: syncFeatured,
+    onSuccess: (data) => toast.success(`Синхронизация завершена: добавлено ${data.added} записей`),
+    onError: () => toast.error("Ошибка синхронизации"),
+  });
+
   return (
     <div className="space-y-4">
       <PageHeader
         title="Recipes"
         description="Manage recipes"
-        action={<Button onClick={() => navigate("/recipes/new")}><Plus className="mr-2 h-4 w-4" /> New Recipe</Button>}
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => syncMutation.mutate()} disabled={syncMutation.isPending}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${syncMutation.isPending ? "animate-spin" : ""}`} />
+              Sync Featured
+            </Button>
+            <Button onClick={() => navigate("/recipes/new")}><Plus className="mr-2 h-4 w-4" /> New Recipe</Button>
+          </div>
+        }
       />
       <div className="flex gap-3 items-center">
         <Input placeholder="Search recipes..." value={search} onChange={(e) => updateParams({ search: e.target.value, page: undefined })} className="max-w-sm" />
@@ -153,6 +180,9 @@ export default function RecipesListPage() {
                     <TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => featuredMutation.mutate(r.id)} title={r.is_featured ? "Remove from featured" : "Add to featured"}>
+                          <Heart className={`h-4 w-4 ${r.is_featured ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                        </Button>
                         <Button variant="ghost" size="icon" onClick={() => navigate(`/recipes/${r.id}/edit`)}><Pencil className="h-4 w-4" /></Button>
                         <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(r)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                       </div>

@@ -115,8 +115,18 @@ export interface RecipeAdmin {
   servings: string;
   slug: string;
   is_active: boolean;
+  is_featured: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface FeaturedToggleResponse {
+  id: string;
+  is_featured: boolean;
+}
+
+export interface FeaturedSyncResponse {
+  added: number;
 }
 
 export interface RecipeDetail {

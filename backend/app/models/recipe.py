@@ -1,8 +1,9 @@
 """Recipe ORM model."""
 
 import enum
+from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, Index, Integer, Numeric, String, Text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, Index, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -34,6 +35,8 @@ class Recipe(UUIDMixin, TimestampMixin, Base):
     servings: Mapped[str] = mapped_column(String(50), nullable=False)
     slug: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
+    is_featured: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
+    featured_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     steps: Mapped[list["Step"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
         back_populates="recipe", lazy="raise", order_by="Step.step_number",

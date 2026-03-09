@@ -46,6 +46,7 @@ class RecipeRepository(BaseRepository[Recipe]):
         slug: str | None = None, difficulty: str | None = None,
         category_id: UUID | None = None,
         sort_by: str | None = None,
+        is_featured: bool | None = None,
     ) -> PaginatedResponse[Recipe]:
         filters: list[Any] = []
         if search:
@@ -56,6 +57,8 @@ class RecipeRepository(BaseRepository[Recipe]):
             filters.append(Recipe.slug == slug)
         if difficulty:
             filters.append(Recipe.difficulty == difficulty)
+        if is_featured is not None:
+            filters.append(Recipe.is_featured == is_featured)
 
         query: Select[tuple[Recipe]] = select(Recipe)
         count_query = select(func.count()).select_from(Recipe)

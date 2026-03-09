@@ -10,6 +10,8 @@ from redis.asyncio import Redis
 
 from app.core.config import get_settings
 from app.core.constants import REDIS_BLACKLIST_VALUE, TOKEN_TYPE
+from sqlalchemy import select
+
 from app.core.exceptions import BadRequestException, UnauthorizedException
 from app.core.security import (
     create_access_token,
@@ -19,6 +21,8 @@ from app.core.security import (
     verify_telegram_hash,
     verify_telegram_webapp,
 )
+from app.models.favorite import FavoriteRecipe
+from app.models.recipe import Recipe
 from app.models.user import Admin, User
 from app.repositories.user import UserRepository
 from app.schemas.auth import (
@@ -213,5 +217,18 @@ class AuthService:
             first_name=auth_data.first_name, last_name=auth_data.last_name,
         )
         await self.repo.create(user)
+        await self._copy_featured_to_favorites(user.id)
         logger.info("user_created", user_id=str(user.id), tg_id=auth_data.id)
         return user
+
+    async def _copy_featured_to_favorites(self, user_id: UUID) -> None:
+        """Copy all featured recipes into the new user's favorites."""
+        db = self.repo.db
+        result = await db.execute(
+            select(Recipe.id).where(Recipe.is_featured.is_(True), Recipe.is_active.is_(True))
+        )
+        recipe_ids = result.scalars().all()
+        for recipe_id in recipe_ids:
+            db.add(FavoriteRecipe(user_id=user_id, recipe_id=recipe_id))
+        await db.flush()
+        logger.info("featured_copied_to_favorites", user_id=str(user_id), count=len(recipe_ids))

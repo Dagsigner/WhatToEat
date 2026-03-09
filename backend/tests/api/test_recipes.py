@@ -112,3 +112,52 @@ async def test_record_history(client: AsyncClient):
     data = response.json()
     assert data["is_in_history"] is True
     assert data["id"] == recipe["id"]
+
+
+async def test_toggle_featured(client: AsyncClient):
+    recipe = await _create_recipe(client)
+
+    # Initially not featured
+    resp = await client.patch(f"/api/v1/recipes/{recipe['id']}/admin/featured")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["is_featured"] is True
+    assert data["id"] == recipe["id"]
+
+    # Toggle back off
+    resp = await client.patch(f"/api/v1/recipes/{recipe['id']}/admin/featured")
+    assert resp.status_code == 200
+    assert resp.json()["is_featured"] is False
+
+
+async def test_list_recipes_admin_filter_featured(client: AsyncClient):
+    r1 = await _create_recipe(client)
+    r2 = await _create_recipe(client)
+
+    # Make r1 featured
+    await client.patch(f"/api/v1/recipes/{r1['id']}/admin/featured")
+
+    # Filter featured only
+    resp = await client.get("/api/v1/recipes/admin", params={"is_featured": "true"})
+    assert resp.status_code == 200
+    data = resp.json()
+    ids = [item["id"] for item in data["items"]]
+    assert r1["id"] in ids
+    assert r2["id"] not in ids
+
+    # Filter non-featured
+    resp = await client.get("/api/v1/recipes/admin", params={"is_featured": "false"})
+    assert resp.status_code == 200
+    data = resp.json()
+    ids = [item["id"] for item in data["items"]]
+    assert r1["id"] not in ids
+    assert r2["id"] in ids
+
+
+async def test_admin_list_includes_is_featured_field(client: AsyncClient):
+    await _create_recipe(client)
+    resp = await client.get("/api/v1/recipes/admin")
+    assert resp.status_code == 200
+    item = resp.json()["items"][0]
+    assert "is_featured" in item
+    assert item["is_featured"] is False

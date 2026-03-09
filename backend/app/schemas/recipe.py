@@ -98,8 +98,14 @@ class RecipeAdminListResponse(BaseModel):
     servings: str
     slug: str
     is_active: bool
+    is_featured: bool
     created_at: datetime
     updated_at: datetime
+
+
+class FeaturedToggleResponse(BaseModel):
+    id: UUID
+    is_featured: bool
 
 
 class RecipeDetailResponse(BaseModel):
@@ -140,3 +146,7 @@ class HistoryToggleResponse(BaseModel):
 class RecipeDeleteResponse(BaseModel):
     id: UUID
     is_deleted: bool = True
+
+
+class FeaturedSyncResponse(BaseModel):
+    added: int

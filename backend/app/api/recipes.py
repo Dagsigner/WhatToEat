@@ -19,6 +19,8 @@ from app.schemas.cooking_history import CookingHistoryCreate
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.recipe import (
     FavoriteToggleResponse,
+    FeaturedSyncResponse,
+    FeaturedToggleResponse,
     HistoryToggleResponse,
     RecipeAdminListResponse,
     RecipeClientListResponse,
@@ -59,6 +61,7 @@ async def list_recipes_admin(
     search: str | None = Query(None),
     slug: str | None = Query(None),
     is_active: bool | None = Query(None),
+    is_featured: bool | None = Query(None),
     category_id: UUID | None = Query(None),
     sort_by: str | None = Query(None),
     _admin: User = Depends(get_current_admin),
@@ -66,7 +69,7 @@ async def list_recipes_admin(
 ) -> PaginatedResponse[Recipe]:
     return await service.list(
         pagination, search=search, slug=slug, is_active=is_active,
-        category_id=category_id, sort_by=sort_by,
+        is_featured=is_featured, category_id=category_id, sort_by=sort_by,
     )
 
 
@@ -98,6 +101,25 @@ async def update_recipe_admin(
 ) -> Recipe:
     await service.update(recipe_id, data)
     return await service.get_by_id(recipe_id)
+
+
+@router.patch("/{recipe_id}/admin/featured", response_model=FeaturedToggleResponse, status_code=200)
+async def toggle_featured(
+    recipe_id: UUID,
+    _admin: User = Depends(get_current_admin),
+    service: RecipeService = Depends(get_recipe_service),
+) -> FeaturedToggleResponse:
+    recipe = await service.toggle_featured(recipe_id)
+    return FeaturedToggleResponse(id=recipe.id, is_featured=recipe.is_featured)
+
+
+@router.post("/admin/sync-featured", response_model=FeaturedSyncResponse, status_code=200)
+async def sync_featured(
+    _admin: User = Depends(get_current_admin),
+    service: RecipeService = Depends(get_recipe_service),
+) -> FeaturedSyncResponse:
+    added = await service.sync_featured_to_users()
+    return FeaturedSyncResponse(added=added)
 
 
 @router.delete("/{recipe_id}/admin", response_model=RecipeDeleteResponse, status_code=200)
