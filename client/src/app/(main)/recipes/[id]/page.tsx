@@ -144,7 +144,7 @@ export default function RecipeDetailPage() {
                     {ri.ingredient?.title ?? "—"}
                   </span>
                   <span className="text-muted-foreground">
-                    {ri.amount} {ri.ingredient?.unit_of_measurement ?? ""}
+                    {parseFloat(String(ri.amount))} {ri.ingredient?.unit_of_measurement ?? ""}
                   </span>
                 </li>
               ))}
