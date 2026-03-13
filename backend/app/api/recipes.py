@@ -45,6 +45,7 @@ async def list_recipes(
     slug: str | None = Query(None),
     is_in_history: bool | None = Query(None),
     is_favorited: bool | None = Query(None),
+    random: bool = Query(False),
     current_user: User = Depends(get_current_user),
     service: RecipeService = Depends(get_recipe_service),
 ) -> PaginatedResponse[RecipeClientListResponse]:
@@ -52,6 +53,7 @@ async def list_recipes(
         pagination, current_user.id,
         category_id=category_id, search=search, slug=slug,
         is_in_history=is_in_history, is_favorited=is_favorited,
+        random=random,
     )
 
 

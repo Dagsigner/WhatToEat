@@ -15,6 +15,7 @@ export interface FetchRecipesParams {
   search?: string;
   is_in_history?: boolean;
   is_favorited?: boolean;
+  random?: boolean;
 }
 
 export async function fetchRecipes(

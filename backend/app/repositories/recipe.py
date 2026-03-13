@@ -88,6 +88,7 @@ class RecipeRepository(BaseRepository[Recipe]):
         self, limit: int, offset: int, user_id: UUID, *,
         category_id: UUID | None = None, search: str | None = None, slug: str | None = None,
         is_in_history: bool | None = None, is_favorited: bool | None = None,
+        random: bool = False,
     ) -> tuple[Sequence[Row[Any]], int]:
         history_exists = exists(
             select(CookingHistory.id).where(
@@ -137,7 +138,8 @@ class RecipeRepository(BaseRepository[Recipe]):
         total_result = await self.db.execute(count_query)
         total = total_result.scalar_one()
 
-        query = query.offset(offset).limit(limit).order_by(Recipe.created_at.desc())
+        order = func.random() if random else Recipe.created_at.desc()
+        query = query.offset(offset).limit(limit).order_by(order)
         result = await self.db.execute(query)
         return result.all(), total
 

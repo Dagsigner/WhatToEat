@@ -13,6 +13,8 @@ export default function HomePage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { data: suggestions, isLoading: suggestionsLoading } = useRecipes({
     is_in_history: false,
+    is_favorited: true,
+    random: true,
     limit: 4,
   });
   const toggleFav = useToggleFavorite();
