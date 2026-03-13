@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useCookingHistory, useRecipes, useToggleFavorite } from "@/features/recipes";
+import { useAddToHistory, useCookingHistory, useRecipes, useToggleFavorite } from "@/features/recipes";
+import { toast } from "sonner";
+import axios from "axios";
 import { RecipeCard, HistoryCard, Spinner, EmptyState, Button } from "@/shared/ui";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Pot01Icon, BookOpen01Icon } from "@hugeicons/core-free-icons";
@@ -14,6 +16,7 @@ export default function HomePage() {
     limit: 4,
   });
   const toggleFav = useToggleFavorite();
+  const addHistory = useAddToHistory();
   const historyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,8 +25,30 @@ export default function HomePage() {
     }
   }, [history]);
 
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const cookedTodayIds = new Set(
+    history
+      ?.filter((item) => item.cooked_at.slice(0, 10) === todayStr)
+      .map((item) => item.recipe.id) ?? [],
+  );
+
   const handleFavorite = (id: string, current: boolean) => {
     toggleFav.mutate({ id, isFavorited: current });
+  };
+
+  const handleCookToday = (id: string) => {
+    addHistory.mutate(id, {
+      onSuccess: () => {
+        toast.success("Рецепт добавлен в историю!");
+      },
+      onError: (error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 409) {
+          toast.error("Вы уже отметили блюдо сегодня");
+        } else {
+          toast.error("Не удалось сохранить");
+        }
+      },
+    });
   };
 
   return (
@@ -56,26 +81,23 @@ export default function HomePage() {
       </section>
 
       {/* Что поесть сегодня? — остров */}
-      <section className="flex flex-col gap-28 rounded-3xl bg-secondary p-2.5">
+      <section className="flex flex-col gap-8 rounded-3xl bg-secondary p-2.5">
         <div className="text-center">
           <h2 className="text-2xl font-bold leading-8 text-card-foreground">
             Что поесть сегодня?
           </h2>
           <p className="mt-1 text-base font-semibold leading-6 text-muted-foreground">
-            Подберем подходящие блюда
+            Подберем подходящие блюда на основе вашей истории готовки
           </p>
         </div>
 
         {!showSuggestions ? (
           <button
             onClick={() => setShowSuggestions(true)}
-            className="flex w-full flex-col items-center rounded-2xl bg-primary px-4 py-3"
+            className="flex h-16 w-full flex-col items-center justify-center rounded-2xl bg-primary px-4"
           >
             <span className="text-base font-semibold leading-6 text-primary-foreground">
               Получить список блюд
-            </span>
-            <span className="text-base font-semibold leading-6 text-primary-foreground/80">
-              Подберем на основе истории
             </span>
           </button>
         ) : suggestionsLoading ? (
@@ -96,6 +118,8 @@ export default function HomePage() {
                 recipe={recipe}
                 variant="horizontal"
                 onFavoriteToggle={handleFavorite}
+                onCookToday={handleCookToday}
+                cookedToday={cookedTodayIds.has(recipe.id)}
               />
             ))}
           </div>

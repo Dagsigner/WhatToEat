@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
 import {
+  useCookingHistory,
   useRecipeDetail,
   useToggleFavorite,
   useAddToHistory,
@@ -18,6 +19,12 @@ export default function RecipeDetailPage() {
   const { data: recipe, isLoading, isError, refetch } = useRecipeDetail(id);
   const toggleFav = useToggleFavorite();
   const addHistory = useAddToHistory();
+  const { data: history } = useCookingHistory();
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const cookedToday = history?.some(
+    (item) => item.recipe.id === id && item.cooked_at.slice(0, 10) === todayStr,
+  ) ?? false;
 
   if (isLoading) {
     return <Spinner className="pt-20" />;
@@ -211,7 +218,7 @@ export default function RecipeDetailPage() {
               },
             })
           }
-          disabled={addHistory.isPending}
+          disabled={addHistory.isPending || cookedToday}
           className="flex-1 rounded-xl"
           size="lg"
         >
