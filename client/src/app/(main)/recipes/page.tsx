@@ -74,8 +74,8 @@ export default function RecipesPage() {
         <div className="overflow-x-auto pb-1 scrollbar-hide">
           <ToggleGroup
             type="single"
-            value={selectedCategory ?? ""}
-            onValueChange={(v) => setSelectedCategory(v || null)}
+            value={selectedCategory ? [selectedCategory] : [""]}
+            onValueChange={(v) => setSelectedCategory((v as string[])[0] || null)}
             spacing={2}
             className="flex w-max"
           >
