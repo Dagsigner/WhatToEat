@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
@@ -10,6 +11,8 @@ import {
   useAddToHistory,
 } from "@/features/recipes";
 import { Spinner, Button } from "@/shared/ui";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { formatMinutes, formatDifficulty } from "@/shared/lib/format";
 import { getImageUrl } from "@/shared/lib/image-url";
 
@@ -20,6 +23,18 @@ export default function RecipeDetailPage() {
   const toggleFav = useToggleFavorite();
   const addHistory = useAddToHistory();
   const { data: history } = useCookingHistory();
+
+  useEffect(() => {
+    const tg = window.Telegram?.WebApp;
+    const btn = tg?.BackButton;
+    if (!btn) return;
+    btn.show();
+    btn.onClick(router.back);
+    return () => {
+      btn.hide();
+      btn.offClick(router.back);
+    };
+  }, [router]);
 
   const todayStr = new Date().toISOString().slice(0, 10);
   const cookedToday = history?.some(
@@ -68,27 +83,27 @@ export default function RecipeDetailPage() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white"
+          className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white"
         >
-          ←
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={28} />
         </button>
       </div>
 
-      <div className="space-y-5 p-4">
+      <div className="space-y-7 p-4">
         {/* Заголовок */}
         <div>
           <h1 className="text-xl font-bold text-foreground">
             {recipe.title}
           </h1>
           {recipe.description && (
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm font-medium text-muted-foreground">
               {recipe.description}
             </p>
           )}
         </div>
 
         {/* Мета */}
-        <div className="flex gap-4 text-sm">
+        <div className="flex gap-3 text-sm">
           <MetaBadge label="Время" value={formatMinutes(totalTime)} />
           <MetaBadge label="Сложность" value={formatDifficulty(recipe.difficulty)} />
           <MetaBadge label="Порции" value={recipe.servings} />
@@ -120,7 +135,7 @@ export default function RecipeDetailPage() {
             {recipe.categories.map((cat) => (
               <span
                 key={cat.id}
-                className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground"
+                className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground"
               >
                 {cat.title}
               </span>
@@ -131,14 +146,14 @@ export default function RecipeDetailPage() {
         {/* Ингредиенты */}
         {recipe.recipe_ingredients.length > 0 && (
           <div>
-            <h2 className="mb-2 text-base font-semibold text-foreground">
+            <h2 className="mb-3 text-lg font-semibold text-foreground">
               Ингредиенты
             </h2>
             <ul className="space-y-2">
               {recipe.recipe_ingredients.map((ri) => (
                 <li
                   key={ri.id}
-                  className="flex items-center justify-between rounded-lg bg-secondary px-3 py-2 text-sm"
+                  className="flex items-center justify-between rounded-lg bg-secondary px-3 py-2 text-base font-medium"
                 >
                   <span className="text-foreground">
                     {ri.ingredient?.title ?? "—"}
@@ -155,7 +170,7 @@ export default function RecipeDetailPage() {
         {/* Шаги */}
         {recipe.steps.length > 0 && (
           <div>
-            <h2 className="mb-2 text-base font-semibold text-foreground">
+            <h2 className="mb-3 text-lg font-semibold text-foreground">
               Приготовление
             </h2>
             <ol className="space-y-4">
@@ -168,11 +183,11 @@ export default function RecipeDetailPage() {
                         {step.step_number}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-foreground">
+                        <p className="text-lg font-medium text-foreground">
                           {step.title}
                         </p>
                         {step.description && (
-                          <p className="mt-1 text-sm text-muted-foreground">
+                          <p className="mt-1 text-base font-medium text-muted-foreground">
                             {step.description}
                           </p>
                         )}
@@ -231,8 +246,8 @@ export default function RecipeDetailPage() {
 
 function MetaBadge({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-secondary px-3 py-2 text-center">
-      <p className="text-xs text-muted-foreground">{label}</p>
+    <div className="flex-1 rounded-lg bg-secondary px-3 py-2 text-center">
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <p className="text-sm font-medium text-foreground">
         {value}
       </p>
@@ -246,7 +261,7 @@ function NutritionItem({ label, value }: { label: string; value: string }) {
       <p className="text-sm font-medium text-foreground">
         {value}
       </p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
     </div>
   );
 }

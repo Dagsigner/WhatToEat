@@ -6,6 +6,12 @@ interface TelegramWebApp {
   offEvent: (event: string, callback: () => void) => void;
   ready: () => void;
   close: () => void;
+  BackButton: {
+    show: () => void;
+    hide: () => void;
+    onClick: (fn: () => void) => void;
+    offClick: (fn: () => void) => void;
+  };
 }
 
 interface Window {

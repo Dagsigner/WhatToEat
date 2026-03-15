@@ -3,8 +3,7 @@
 import { useState, useMemo, useRef, useCallback } from "react";
 import { useInfiniteRecipes, useToggleFavorite } from "@/features/recipes";
 import { useCategories } from "@/features/categories";
-import { RecipeCard, Spinner, EmptyState, Input } from "@/shared/ui";
-import { cn } from "@/shared/lib/utils";
+import { RecipeCard, Spinner, EmptyState, Input, Tabs, TabsList, TabsTrigger, ToggleGroup, ToggleGroupItem } from "@/shared/ui";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { HeartbreakIcon, Search01Icon } from "@hugeicons/core-free-icons";
 import { useDebounce } from "@/shared/lib/use-debounce";
@@ -12,7 +11,7 @@ import { useDebounce } from "@/shared/lib/use-debounce";
 type Tab = "all" | "favorites";
 
 export default function RecipesPage() {
-  const [tab, setTab] = useState<Tab>("all");
+  const [tab, setTab] = useState<Tab>("favorites");
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -53,24 +52,13 @@ export default function RecipesPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      {/* Вкладки */}
-      <div className="flex gap-2">
-        {(["all", "favorites"] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-              tab === t
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-muted-foreground",
-            )}
-          >
-            {t === "all" ? "Все" : "Избранное"}
-          </button>
-        ))}
-      </div>
+      {/* Segmented control */}
+      <Tabs value={tab} onValueChange={(v) => setTab(v as Tab)}>
+        <TabsList className="w-full !h-10">
+          <TabsTrigger value="favorites" className="flex-1">Избранное</TabsTrigger>
+          <TabsTrigger value="all" className="flex-1">Все</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       {/* Поиск */}
       <Input
@@ -83,34 +71,21 @@ export default function RecipesPage() {
 
       {/* Категории */}
       {categories && categories.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory(null)}
-            className={cn(
-              "flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors",
-              selectedCategory === null
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-muted-foreground",
-            )}
+        <div className="overflow-x-auto pb-1 scrollbar-hide">
+          <ToggleGroup
+            type="single"
+            value={selectedCategory ?? ""}
+            onValueChange={(v) => setSelectedCategory(v || null)}
+            spacing={2}
+            className="flex w-max"
           >
-            Все
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => setSelectedCategory(cat.id)}
-              className={cn(
-                "flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors",
-                selectedCategory === cat.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground",
-              )}
-            >
-              {cat.title}
-            </button>
-          ))}
+            <ToggleGroupItem value="" className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground aria-pressed:bg-foreground aria-pressed:text-background">Все</ToggleGroupItem>
+            {categories.map((cat) => (
+              <ToggleGroupItem key={cat.id} value={cat.id} className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground aria-pressed:bg-foreground aria-pressed:text-background">
+                {cat.title}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
       )}
 

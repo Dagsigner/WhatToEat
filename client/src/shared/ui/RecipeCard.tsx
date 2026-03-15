@@ -8,6 +8,14 @@ import type { RecipeListItem } from "@/shared/types/recipe";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FavouriteIcon } from "@hugeicons/core-free-icons";
 
+function HeartSolid({ size, color }: { size: number; color: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fillRule="evenodd" clipRule="evenodd" d="M11.9999 3.94228C13.1757 2.85872 14.7069 2.25 16.3053 2.25C18.0313 2.25 19.679 2.95977 20.8854 4.21074C22.0832 5.45181 22.75 7.1248 22.75 8.86222C22.75 10.5997 22.0831 12.2728 20.8854 13.5137C20.089 14.3393 19.2938 15.1836 18.4945 16.0323C16.871 17.7562 15.2301 19.4985 13.5256 21.14L13.5216 21.1438C12.6426 21.9779 11.2505 21.9476 10.409 21.0754L3.11399 13.5136C0.62867 10.9374 0.62867 6.78707 3.11399 4.21085C5.54605 1.68984 9.46239 1.60032 11.9999 3.94228Z" fill={color} />
+    </svg>
+  );
+}
+
 interface RecipeCardProps {
   recipe: RecipeListItem;
   variant?: "horizontal" | "vertical";
@@ -44,7 +52,9 @@ export function RecipeCard({
                 }}
                 className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/30"
               >
-                <HugeiconsIcon icon={FavouriteIcon} size={16} color={recipe.is_favorited ? "#ef4444" : "currentColor"} />
+                {recipe.is_favorited
+  ? <HeartSolid size={16} color="#ef4444" />
+  : <HugeiconsIcon icon={FavouriteIcon} size={16} />}
               </button>
             )}
           </div>
@@ -106,7 +116,9 @@ export function RecipeCard({
                 onFavoriteToggle(recipe.id, recipe.is_favorited);
               }}
             >
-              <HugeiconsIcon icon={FavouriteIcon} size={20} color={recipe.is_favorited ? "#ef4444" : "currentColor"} />
+              {recipe.is_favorited
+  ? <HeartSolid size={20} color="#ef4444" />
+  : <HugeiconsIcon icon={FavouriteIcon} size={20} />}
             </button>
           </div>
         )}
